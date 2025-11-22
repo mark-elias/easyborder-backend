@@ -22,10 +22,14 @@ async function bootstrap() {
   await app.listen(port);
 
   // basic logging
-  console.log('🚀 Backend running on port:', port);
-  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log('🚀 Server running on port:', port);
+  console.log(`📊 Environment: ${process.env.NODE_ENV}`);
   console.log(
-    `🌐 CORS enabled for: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`,
+    `🌱 Database: `,
+    process.env.DATABASE_URL ? '✅ Connected' : '❌ Not Connected',
+  );
+  console.log(
+    `⚡️ CORS enabled for: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`,
   );
 }
 bootstrap();

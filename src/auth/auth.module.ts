@@ -8,9 +8,12 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 // strategies
 import { JwtStrategy } from './strategies/jwt.strategy';
-// user schema
+// user
+import { UserModule } from 'src/user/user.module';
 import { UserSchema } from 'src/user/schemas/user.schema';
 //
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
 
 @Module({
   imports: [
@@ -32,9 +35,10 @@ import { UserSchema } from 'src/user/schemas/user.schema';
         };
       },
     }),
+    UserModule,
   ],
-  controllers: [],
-  providers: [JwtStrategy],
+  controllers: [AuthController],
+  providers: [JwtStrategy, AuthService],
   // so that other modules can use the JwtStrategy and PassportModule
   exports: [JwtStrategy, PassportModule],
 })

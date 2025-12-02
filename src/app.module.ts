@@ -1,8 +1,13 @@
 import { Module } from '@nestjs/common';
+// app
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+// for environment variables
 import { ConfigModule } from '@nestjs/config';
+// for mongoDb
 import { MongooseModule } from '@nestjs/mongoose';
+// modules
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -17,6 +22,7 @@ import { MongooseModule } from '@nestjs/mongoose';
         return connection;
       },
     }),
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

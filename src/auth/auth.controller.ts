@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 // DTOs
 import { CreateUserDto } from 'src/user/DTOs/create-user.dto';
+import { LoginUserDto } from './DTOs/login-user.dto';
 // auth
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt.guard';
@@ -14,6 +15,11 @@ export class AuthController {
     @Body() createUserDto: CreateUserDto,
   ): Promise<{ token: string }> {
     return this.authService.registerUser(createUserDto);
+  }
+
+  @Post('login')
+  loginUser(@Body() loginUserDto: LoginUserDto): Promise<{ token: string }> {
+    return this.authService.loginUser(loginUserDto);
   }
 
   // protected route

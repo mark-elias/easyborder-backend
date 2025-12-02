@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 // modules
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -17,12 +18,12 @@ import { UserModule } from './user/user.module';
     }),
     MongooseModule.forRoot(process.env.DATABASE_URL || '', {
       onConnectionCreate: (connection) => {
-        console.log('🌱 Database connected successfully');
-        console.log(`📊 Database: ${connection.name}`);
+        console.log('🌱 Database connected');
         return connection;
       },
     }),
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

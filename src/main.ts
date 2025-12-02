@@ -1,11 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   // CREATE APP INSTANCE
   const app = await NestFactory.create(AppModule);
 
-  // APP CONFIGURATION
+  // APP CONFIGURATION ==============================
   // enable CORS for frontend connection
   app.enableCors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -14,10 +15,19 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
+  // validation pipe for requests
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+
   // global prefix for all routes
   app.setGlobalPrefix('api');
 
-  // START SERVER
+  // START SERVER ==============================
   const port = process.env.PORT || 3001;
   await app.listen(port);
 

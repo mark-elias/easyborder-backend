@@ -5,11 +5,14 @@ import { LoginUserDto } from './DTOs/login-user.dto';
 // auth
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt.guard';
+// rate limiting
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('register')
   registerUser(
     @Body() createUserDto: CreateUserDto,
@@ -17,6 +20,7 @@ export class AuthController {
     return this.authService.registerUser(createUserDto);
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('login')
   loginUser(@Body() loginUserDto: LoginUserDto): Promise<{ token: string }> {
     return this.authService.loginUser(loginUserDto);

@@ -6,6 +6,9 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 // for mongoDb
 import { MongooseModule } from '@nestjs/mongoose';
+// rate limiting
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 // modules
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
@@ -22,10 +25,22 @@ import { AuthModule } from './auth/auth.module';
         return connection;
       },
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // 1 minute window
+        limit: 100, // 100 requests per minute
+      },
+    ]),
     UserModule,
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

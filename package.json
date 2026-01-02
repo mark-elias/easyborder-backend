@@ -1,6 +1,11 @@
 {
   "name": "easyborder-backend",
   "version": "0.0.1",
+  "packageManager": "pnpm@10.15.0",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.15.0"
+  },
   "description": "",
   "author": "",
   "private": true,

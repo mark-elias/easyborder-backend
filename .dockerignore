@@ -1,0 +1,59 @@
+# Dependencies (will be installed fresh in container)
+node_modules
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs (will be built fresh in container)
+dist
+build
+
+# Environment files (provided at runtime)
+.env*
+!.env.example
+
+# Git files (not needed in container)
+.git
+.gitignore
+
+# Docker files (not needed inside container)
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# IDE files
+.vscode
+.idea
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage and test files
+coverage
+.nyc_output
+test/
+*.test.js
+*.spec.js
+
+# Temporary folders
+tmp/
+temp/
+
+# Documentation
+README.md
+docs/
+
+# PM2 (not needed in Docker)
+ecosystem.config.js

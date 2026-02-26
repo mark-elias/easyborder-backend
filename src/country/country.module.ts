@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CountrySchema, Country } from './schemas/country.schema';
+import { CountrySchema, Country } from './country.schema';
 
 @Module({
   imports: [

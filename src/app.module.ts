@@ -14,6 +14,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { CountryModule } from './country/country.module';
 import { CrossingModule } from './crossing/crossing.module';
+import { WaitTimeModule } from './wait-time/wait-time.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { CrossingModule } from './crossing/crossing.module';
     AuthModule,
     CountryModule,
     CrossingModule,
+    WaitTimeModule,
   ],
   controllers: [AppController],
   providers: [

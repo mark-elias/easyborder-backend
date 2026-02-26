@@ -13,6 +13,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { CountryModule } from './country/country.module';
+import { CrossingModule } from './crossing/crossing.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { CountryModule } from './country/country.module';
     UserModule,
     AuthModule,
     CountryModule,
+    CrossingModule,
   ],
   controllers: [AppController],
   providers: [

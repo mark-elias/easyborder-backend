@@ -19,7 +19,16 @@ export class Crossing extends Document {
   hours: string;
 
   @Prop()
+  date: string;
+
+  @Prop()
+  time: string;
+
+  @Prop()
   portStatus: string;
+
+  @Prop()
+  constructionNotice: string;
 }
 
 export const CrossingSchema = SchemaFactory.createForClass(Crossing);

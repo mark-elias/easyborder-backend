@@ -16,13 +16,10 @@ export class WaitTime extends Document {
   portNumber: string;
 
   @Prop({ required: true })
-  date: string;
+  fetchedAt: Date;
 
-  @Prop({ required: true })
-  time: string;
-
-  @Prop({ required: true })
-  portStatus: string;
+  @Prop({ default: true })
+  isCurrent: boolean;
 
   // vehicle lanes
   @Prop({ type: Object })
@@ -63,12 +60,6 @@ export class WaitTime extends Document {
       lanesOpen: number;
     };
   };
-
-  @Prop({ required: true })
-  fetchedAt: Date;
-
-  @Prop({ default: true })
-  isCurrent: boolean;
 }
 
 export const WaitTimeSchema = SchemaFactory.createForClass(WaitTime);

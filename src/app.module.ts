@@ -12,6 +12,7 @@ import { APP_GUARD } from '@nestjs/core';
 // modules
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { CountryModule } from './country/country.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AuthModule } from './auth/auth.module';
     ]),
     UserModule,
     AuthModule,
+    CountryModule,
   ],
   controllers: [AppController],
   providers: [

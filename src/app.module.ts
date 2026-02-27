@@ -15,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
 import { CountryModule } from './country/country.module';
 import { CrossingModule } from './crossing/crossing.module';
 import { WaitTimeModule } from './wait-time/wait-time.module';
+import { CbpModule } from './cbp/cbp.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { WaitTimeModule } from './wait-time/wait-time.module';
     CountryModule,
     CrossingModule,
     WaitTimeModule,
+    CbpModule,
   ],
   controllers: [AppController],
   providers: [

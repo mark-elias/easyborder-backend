@@ -42,7 +42,7 @@ interface ParsedLane {
 }
 
 @Injectable()
-export class CBPService {
+export class CbpService {
   constructor(
     @InjectModel(WaitTime.name) private waitTimeModel: Model<WaitTime>,
     @InjectModel(Crossing.name) private crossingModel: Model<Crossing>,

@@ -58,11 +58,15 @@ export class CbpService {
       );
       const ports = response.data;
 
-      // Mark old wait times as outdated
-      await this.waitTimeModel.updateMany(
-        { isCurrent: true },
-        { isCurrent: false },
-      );
+      // // Mark old wait times as outdated
+      // await this.waitTimeModel.updateMany(
+      //   { isCurrent: true },
+      //   { isCurrent: false },
+      // );
+
+      // delete old wait times
+      // Delete all old wait times
+      await this.waitTimeModel.deleteMany({});
 
       // Loop through each port and save it
       for (const port of ports) {

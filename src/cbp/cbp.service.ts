@@ -51,80 +51,90 @@ export class CbpService {
 
   // fetch wait times from cbp API and save to database
   async fetchWaitTimes(): Promise<void> {
-    // Get data from API
-    const response = await firstValueFrom(
-      this.httpService.get<CBPPort[]>('https://bwt.cbp.gov/api/waittimes'),
-    );
-    const ports = response.data;
+    try {
+      // Get data from API
+      const response = await firstValueFrom(
+        this.httpService.get<CBPPort[]>('https://bwt.cbp.gov/api/waittimes'),
+      );
+      const ports = response.data;
 
-    // Mark old wait times as outdated
-    await this.waitTimeModel.updateMany(
-      { isCurrent: true },
-      { isCurrent: false },
-    );
+      // Mark old wait times as outdated
+      await this.waitTimeModel.updateMany(
+        { isCurrent: true },
+        { isCurrent: false },
+      );
 
-    // Loop through each port and save it
-    for (const port of ports) {
-      await this.savePort(port);
+      // Loop through each port and save it
+      for (const port of ports) {
+        await this.savePort(port);
+      }
+      console.log('Saved wait times for all ports');
+    } catch (error: unknown) {
+      console.error('failed to fetch wait times 🚨', error);
+      throw error;
     }
-
-    console.log('Saved wait times for all ports');
   }
 
   // Save data for one port
   async savePort(port: CBPPort): Promise<void> {
-    // Find crossing in database
-    let crossing = await this.crossingModel.findOne({
-      portNumber: port.port_number,
-    });
-
-    // If crossing doesn't exist, create it
-    if (!crossing) {
-      crossing = new this.crossingModel({
+    try {
+      // Find crossing in database
+      let crossing = await this.crossingModel.findOne({
         portNumber: port.port_number,
-        border: port.border,
-        portName: port.port_name,
-        crossingName: port.crossing_name,
-        hours: port.hours,
-        date: port.date,
-        time: port.time,
-        portStatus: port.port_status,
-        constructionNotice: port.construction_notice,
       });
-      await crossing.save();
-    } else {
-      // Update existing crossing
-      crossing.date = port.date;
-      crossing.time = port.time;
-      crossing.portStatus = port.port_status;
-      crossing.constructionNotice = port.construction_notice;
-      await crossing.save();
+
+      // If crossing doesn't exist, create it
+      if (!crossing) {
+        crossing = new this.crossingModel({
+          portNumber: port.port_number,
+          border: port.border,
+          portName: port.port_name,
+          crossingName: port.crossing_name,
+          hours: port.hours,
+          date: port.date,
+          time: port.time,
+          portStatus: port.port_status,
+          constructionNotice: port.construction_notice,
+        });
+        await crossing.save();
+      } else {
+        // Update existing crossing
+        crossing.date = port.date;
+        crossing.time = port.time;
+        crossing.portStatus = port.port_status;
+        crossing.constructionNotice = port.construction_notice;
+        await crossing.save();
+      }
+
+      // Get passenger vehicle wait times
+      const passengerVehicle = {
+        standard: this.parseLane(port.passenger_vehicle_lanes?.standard_lanes),
+        sentri: this.parseLane(
+          port.passenger_vehicle_lanes?.NEXUS_SENTRI_lanes,
+        ),
+        ready: this.parseLane(port.passenger_vehicle_lanes?.ready_lanes),
+      };
+
+      // Get pedestrian wait times
+      const pedestrian = {
+        standard: this.parseLane(port.pedestrian_lanes?.standard_lanes),
+        ready: this.parseLane(port.pedestrian_lanes?.ready_lanes),
+      };
+
+      // Create new wait time record
+      const waitTime = new this.waitTimeModel({
+        crossing: crossing._id,
+        portNumber: port.port_number,
+        fetchedAt: new Date(),
+        isCurrent: true,
+        passengerVehicle: passengerVehicle,
+        pedestrian: pedestrian,
+      });
+
+      await waitTime.save();
+    } catch (error: unknown) {
+      console.error(`failed to save port ${port.port_number}:`, error);
     }
-
-    // Get passenger vehicle wait times
-    const passengerVehicle = {
-      standard: this.parseLane(port.passenger_vehicle_lanes?.standard_lanes),
-      sentri: this.parseLane(port.passenger_vehicle_lanes?.NEXUS_SENTRI_lanes),
-      ready: this.parseLane(port.passenger_vehicle_lanes?.ready_lanes),
-    };
-
-    // Get pedestrian wait times
-    const pedestrian = {
-      standard: this.parseLane(port.pedestrian_lanes?.standard_lanes),
-      ready: this.parseLane(port.pedestrian_lanes?.ready_lanes),
-    };
-
-    // Create new wait time record
-    const waitTime = new this.waitTimeModel({
-      crossing: crossing._id,
-      portNumber: port.port_number,
-      fetchedAt: new Date(),
-      isCurrent: true,
-      passengerVehicle: passengerVehicle,
-      pedestrian: pedestrian,
-    });
-
-    await waitTime.save();
   }
 
   // Parse lane data from API

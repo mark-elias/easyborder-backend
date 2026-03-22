@@ -12,7 +12,6 @@ import { APP_GUARD } from '@nestjs/core';
 // modules
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { CountryModule } from './country/country.module';
 import { CrossingModule } from './crossing/crossing.module';
 import { WaitTimeModule } from './wait-time/wait-time.module';
 import { CbpModule } from './cbp/cbp.module';
@@ -37,7 +36,6 @@ import { CbpModule } from './cbp/cbp.module';
     ]),
     UserModule,
     AuthModule,
-    CountryModule,
     CrossingModule,
     WaitTimeModule,
     CbpModule,

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Crossing, CrossingSchema } from './crossing.schema';
+import { CrossingService } from './crossing.service';
 
 @Module({
   imports: [
@@ -9,5 +10,6 @@ import { Crossing, CrossingSchema } from './crossing.schema';
     ]),
   ],
   exports: [MongooseModule],
+  providers: [CrossingService],
 })
 export class CrossingModule {}

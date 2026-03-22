@@ -9,7 +9,7 @@ import { CrossingService } from './crossing.service';
       { name: Crossing.name, schema: CrossingSchema },
     ]),
   ],
-  exports: [MongooseModule],
+  exports: [MongooseModule, CrossingService],
   providers: [CrossingService],
 })
 export class CrossingModule {}

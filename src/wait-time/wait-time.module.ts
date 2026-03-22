@@ -9,7 +9,7 @@ import { WaitTimeService } from './wait-time.service';
       { name: WaitTime.name, schema: WaitTimeSchema },
     ]),
   ],
-  exports: [MongooseModule],
+  exports: [MongooseModule, WaitTimeService],
   providers: [WaitTimeService],
 })
 export class WaitTimeModule {}

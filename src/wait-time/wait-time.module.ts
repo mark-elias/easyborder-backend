@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { WaitTime, WaitTimeSchema } from './wait-time.schema';
 import { MongooseModule } from '@nestjs/mongoose';
+import { WaitTimeService } from './wait-time.service';
 
 @Module({
   imports: [
@@ -9,5 +10,6 @@ import { MongooseModule } from '@nestjs/mongoose';
     ]),
   ],
   exports: [MongooseModule],
+  providers: [WaitTimeService],
 })
 export class WaitTimeModule {}

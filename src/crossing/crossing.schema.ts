@@ -6,15 +6,25 @@ export class Crossing extends Document {
   @Prop({ required: true, unique: true })
   portNumber: string;
 
-  @Prop({ required: true })
-  border: string;
-
+  // cbp api fields
   @Prop({ required: true })
   portName: string;
 
   @Prop()
   crossingName: string;
 
+  // origin fields
+  @Prop({ required: true })
+  originCountry: string; // country code
+
+  @Prop({ required: true })
+  originCity: string;
+
+  // destination fields
+  @Prop({ required: true })
+  destinationCity: string;
+
+  // operational info
   @Prop()
   hours: string;
 

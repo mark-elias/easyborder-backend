@@ -9,6 +9,14 @@ export class CrossingService {
     @InjectModel(Crossing.name) private crossingModel: Model<Crossing>,
   ) {}
 
+  // Get all crossings
+  async getAll(): Promise<Crossing[]> {
+    return this.crossingModel
+      .find()
+      .sort({ originCity: 1, portName: 1 })
+      .exec();
+  }
+
   // Find crossing by port number
   async findByPortNumber(portNumber: string): Promise<Crossing | null> {
     return this.crossingModel.findOne({ portNumber }).exec();

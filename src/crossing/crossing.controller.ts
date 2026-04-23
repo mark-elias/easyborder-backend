@@ -5,27 +5,20 @@ import { CrossingService } from './crossing.service';
 export class CrossingController {
   constructor(private crossingService: CrossingService) {}
 
-  // GET /crossings - Get all crossings
+  // GET /crossings?originCountry=MX&originCity=Tijuana
   @Get()
-  async getAllCrossings() {
-    const crossings = await this.crossingService.getAll();
+  async getCrossings(
+    @Query('originCountry') originCountry: string,
+    @Query('originCity') originCity: string,
+  ) {
+    const crossings = await this.crossingService.getCrossingsByCountryAndCity(
+      originCountry,
+      originCity,
+    );
+
     return {
       count: crossings.length,
       data: crossings,
-    };
-  }
-
-  // GET /crossings/cities?originCountry=MX - Get cities for a country
-  @Get('cities')
-  async getCities(@Query('originCountry') originCountry: string) {
-    if (!originCountry) {
-      return { error: 'originCountry query parameter is required' };
-    }
-
-    const cities = await this.crossingService.getCities(originCountry);
-    return {
-      count: cities.length,
-      data: cities,
     };
   }
 }

@@ -9,14 +9,18 @@ export class CrossingService {
     @InjectModel(Crossing.name) private crossingModel: Model<Crossing>,
   ) {}
 
-  // Get all crossings
-  async getAll(): Promise<Crossing[]> {
+  // Get crossings by origin country and origin city
+  async getCrossingsByCountryAndCity(
+    originCountry: string,
+    originCity: string,
+  ): Promise<Crossing[]> {
     return this.crossingModel
-      .find()
-      .sort({ originCity: 1, portName: 1 })
+      .find({ originCountry, originCity })
+      .sort({ portName: 1 })
       .exec();
   }
 
+  // ===== used by CBP service ===========
   // Find crossing by port number
   async findByPortNumber(portNumber: string): Promise<Crossing | null> {
     return this.crossingModel.findOne({ portNumber }).exec();
@@ -32,24 +36,5 @@ export class CrossingService {
   async update(crossing: Crossing, updates: any): Promise<Crossing> {
     Object.assign(crossing, updates);
     return crossing.save();
-  }
-
-  // Get unique cities for a country
-  async getCities(originCountry: string): Promise<string[]> {
-    const crossings = await this.crossingModel.find({ originCountry }).exec();
-
-    const cities = [...new Set(crossings.map((c) => c.originCity))];
-    return cities.sort();
-  }
-
-  // Get crossings by country and city
-  async getCrossingsByCity(
-    originCountry: string,
-    originCity: string,
-  ): Promise<Crossing[]> {
-    return this.crossingModel
-      .find({ originCountry, originCity })
-      .sort({ portName: 1 })
-      .exec();
   }
 }

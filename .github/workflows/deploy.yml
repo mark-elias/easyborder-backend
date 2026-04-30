@@ -34,22 +34,13 @@ jobs:
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          echo "🐳 pulling image"
-          docker pull ${{ secrets.DOCKER_USERNAME }}/easyborder-backend:latest
-          echo "🐳 stopping existing container"
-          docker stop easyborder-backend || true
-          docker rm easyborder-backend || true
-          echo "🐳 starting new container"
-          docker run -d \
-            --name easyborder-backend \
-            -p 3001:3001 \
-            --env-file /home/ubuntu/.env.production \
-            --restart unless-stopped \
-            ${{ secrets.DOCKER_USERNAME }}/easyborder-backend:latest
-
-          echo "🐳 cleaning up old images"
+          echo "🚀 pulling latest image"
+          # navigate to easyborder folder where docker-compose.yml lives
+          cd /home/ubuntu/easyborder
+          # --no-deps: only restarts backend container, leaves nginx untouched
+          # --pull always: pulls latest image from Docker Hub automatically
+          docker compose up -d --no-deps --pull always backend
+          echo "🧹 cleaning up old images"
           docker image prune -f
-
           echo "✅ deployment complete"
           docker ps | grep easyborder-backend
-        

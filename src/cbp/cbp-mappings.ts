@@ -1,8 +1,8 @@
 // Ports to skip (duplicates/unused)
 export const SKIP_PORTS = ['250608', '250609', '240207', '231002', '230103'];
 
-// US port name → Mexican city
-export const MEXICAN_CITY_MAP: Record<string, string> = {
+// US port name → mexican origin city
+export const MEXICO_ORIGIN_CITY_MAP: Record<string, string> = {
   'San Ysidro': 'Tijuana',
   'Otay Mesa': 'Tijuana',
   'Otay Mesa Port of Entry': 'Tijuana',
@@ -34,8 +34,8 @@ export const MEXICAN_CITY_MAP: Record<string, string> = {
   'BOTA CARGO FACILITY': 'Ciudad Juárez',
 };
 
-// US port name → Canadian city
-export const CANADIAN_CITY_MAP: Record<string, string> = {
+// US port name → canadian origin city
+export const CANADA_ORIGIN_CITY_MAP: Record<string, string> = {
   Blaine: 'Surrey',
   Sumas: 'Abbotsford',
   Lynden: 'Aldergrove',
@@ -59,8 +59,11 @@ export const CANADIAN_CITY_MAP: Record<string, string> = {
   Sweetgrass: 'Coutts',
 };
 
-// Helper function to get origin city
+// takes a port name & country code
+// uses appropriate map to return an origin city
 export function getOriginCity(portName: string, country: 'MX' | 'CA'): string {
-  const map = country === 'MX' ? MEXICAN_CITY_MAP : CANADIAN_CITY_MAP;
+  const map =
+    country === 'MX' ? MEXICO_ORIGIN_CITY_MAP : CANADA_ORIGIN_CITY_MAP;
+
   return map[portName] || portName;
 }

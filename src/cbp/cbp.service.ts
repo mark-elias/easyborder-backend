@@ -1,115 +1,145 @@
 import { Injectable } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
+import axios from 'axios';
+// services
 import { CrossingService } from '../crossing/crossing.service';
 import { WaitTimeService } from '../wait-time/wait-time.service';
-import { CBPPort, CBPLane, ParsedLane } from './cbp.types';
+// schemas
+import { Crossing } from '../crossing/crossing.schema';
+// types
+import {
+  CBPPort,
+  CBPLane,
+  ReformattedCrossing,
+  ReformattedLane,
+} from './cbp.types';
 import { SKIP_PORTS, getOriginCity } from './cbp-mappings';
 
 @Injectable()
 export class CbpService {
-  private readonly CBP_API_URL = 'https://bwt.cbp.gov/api/waittimes';
+  private readonly CBP_API_URL =
+    process.env.CBP_API_URL || 'https://bwt.cbp.gov/api/waittimes';
 
   constructor(
-    private httpService: HttpService,
     private crossingService: CrossingService,
     private waitTimeService: WaitTimeService,
   ) {}
 
-  // Main function: fetch from API and save
+  // fetches all wait times from CBP API and saves to database
   async fetchWaitTimes(): Promise<void> {
     try {
-      console.log('Fetching from CBP API...');
-
-      // Get data from API
-      const response = await firstValueFrom(
-        this.httpService.get<CBPPort[]>(this.CBP_API_URL),
-      );
+      const response = await axios.get<CBPPort[]>(this.CBP_API_URL);
       const ports = response.data;
 
-      // Delete old wait times
       await this.waitTimeService.deleteAll();
 
-      // Process each port
       for (const port of ports) {
-        if (SKIP_PORTS.includes(port.port_number)) {
-          continue;
-        }
-        await this.savePort(port);
+        // dont save unused/duplicate cbp ports
+        if (SKIP_PORTS.includes(port.port_number)) continue;
+
+        await this.saveCrossing(port);
       }
 
-      console.log('✅ Saved wait times for all ports');
+      console.log('✅ successfully fetched wait times');
     } catch (error: unknown) {
-      console.error('❌ Failed to fetch wait times', error);
+      console.error('🚨 failed to fetch wait times:', error);
       throw error;
     }
   }
 
-  // Save one port's data
-  private async savePort(port: CBPPort): Promise<void> {
+  // transforms CBP port data and saves crossing + wait time to database
+  private async saveCrossing(port: CBPPort): Promise<void> {
     try {
-      // Figure out origin country and city
-      const originCountry = port.border === 'Mexican Border' ? 'MX' : 'CA';
-      const originCity = getOriginCity(port.port_name, originCountry);
+      const reformatted = this.transformPort(port);
+      const crossing = await this.saveOrUpdateCrossing(reformatted);
 
-      // Find or create crossing
-      let crossing = await this.crossingService.findByPortNumber(
-        port.port_number,
-      );
-
-      if (!crossing) {
-        crossing = await this.crossingService.create({
-          portNumber: port.port_number,
-          originCountry,
-          originCity,
-          destinationCity: port.port_name,
-          portName: port.port_name,
-          crossingName: port.crossing_name,
-          hours: port.hours,
-          date: port.date,
-          time: port.time,
-          portStatus: port.port_status,
-          constructionNotice: port.construction_notice,
-        });
-      } else {
-        await this.crossingService.update(crossing, {
-          originCountry,
-          originCity,
-          destinationCity: port.port_name,
-          date: port.date,
-          time: port.time,
-          portStatus: port.port_status,
-          constructionNotice: port.construction_notice,
-        });
-      }
-
-      // Save wait time
+      // create waittime for crossing
       await this.waitTimeService.create({
         crossing: crossing._id,
         portNumber: port.port_number,
         fetchedAt: new Date(),
         isCurrent: true,
-        passengerVehicle: {
-          standard: this.parseLane(
-            port.passenger_vehicle_lanes?.standard_lanes,
-          ),
-          sentri: this.parseLane(
-            port.passenger_vehicle_lanes?.NEXUS_SENTRI_lanes,
-          ),
-          ready: this.parseLane(port.passenger_vehicle_lanes?.ready_lanes),
-        },
-        pedestrian: {
-          standard: this.parseLane(port.pedestrian_lanes?.standard_lanes),
-          ready: this.parseLane(port.pedestrian_lanes?.ready_lanes),
-        },
+        passengerVehicle: reformatted.passengerVehicle,
+        pedestrian: reformatted.pedestrian,
       });
     } catch (error: unknown) {
-      console.error(`❌ Failed to save port ${port.port_number}`, error);
+      console.error(`❌ Failed to save crossing ${port.port_number}:`, error);
     }
   }
 
-  // Convert CBP lane format to our format
-  private parseLane(lane?: CBPLane): ParsedLane {
+  // determines origin country & city
+  // converts CBP format to my ReformattedCrossing
+  private transformPort(port: CBPPort): ReformattedCrossing {
+    const originCountry = port.border === 'Mexican Border' ? 'MX' : 'CA';
+    const originCity = getOriginCity(port.port_name, originCountry);
+
+    return {
+      portNumber: port.port_number,
+      originCountry,
+      originCity,
+      destinationCity: port.port_name,
+      portName: port.port_name,
+      crossingName: port.crossing_name,
+      hours: port.hours,
+      date: port.date,
+      time: port.time,
+      portStatus: port.port_status,
+      constructionNotice: port.construction_notice,
+      passengerVehicle: {
+        standard: this.reformatLane(
+          port.passenger_vehicle_lanes?.standard_lanes,
+        ),
+        sentri: this.reformatLane(
+          port.passenger_vehicle_lanes?.NEXUS_SENTRI_lanes,
+        ),
+        ready: this.reformatLane(port.passenger_vehicle_lanes?.ready_lanes),
+      },
+      pedestrian: {
+        standard: this.reformatLane(port.pedestrian_lanes?.standard_lanes),
+        ready: this.reformatLane(port.pedestrian_lanes?.ready_lanes),
+      },
+    };
+  }
+
+  // saves new crossing or updates existing crossing with latest data
+  private async saveOrUpdateCrossing(
+    data: ReformattedCrossing,
+  ): Promise<Crossing> {
+    // look for existing crossing by port #
+    const crossing = await this.crossingService.findByPortNumber(
+      data.portNumber,
+    );
+
+    // if no existing crossing, create crossing
+    if (!crossing) {
+      return await this.crossingService.create({
+        portNumber: data.portNumber,
+        originCountry: data.originCountry,
+        originCity: data.originCity,
+        destinationCity: data.destinationCity,
+        portName: data.portName,
+        crossingName: data.crossingName,
+        hours: data.hours,
+        date: data.date,
+        time: data.time,
+        portStatus: data.portStatus,
+        constructionNotice: data.constructionNotice,
+      });
+    }
+
+    // if crossing exists, update it
+    return await this.crossingService.update(crossing, {
+      originCountry: data.originCountry,
+      originCity: data.originCity,
+      destinationCity: data.destinationCity,
+      date: data.date,
+      time: data.time,
+      portStatus: data.portStatus,
+      constructionNotice: data.constructionNotice,
+    });
+  }
+
+  // converts CBP lane data to my format
+  private reformatLane(lane?: CBPLane): ReformattedLane {
     if (!lane) {
       return {
         updateTime: '',

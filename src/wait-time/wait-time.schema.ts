@@ -12,14 +12,14 @@ export class WaitTime extends Document {
   })
   crossing: Crossing;
 
-  @Prop({ required: true })
-  portNumber: string;
+  // @Prop({ required: true })
+  // portNumber: string;
 
   @Prop({ required: true })
   fetchedAt: Date;
 
-  @Prop({ default: true })
-  isCurrent: boolean;
+  // @Prop({ default: true })
+  // isCurrent: boolean;
 
   // vehicle lanes
   @Prop({ type: Object })
@@ -63,3 +63,6 @@ export class WaitTime extends Document {
 }
 
 export const WaitTimeSchema = SchemaFactory.createForClass(WaitTime);
+
+// indexing
+WaitTimeSchema.index({ crossing: 1 });

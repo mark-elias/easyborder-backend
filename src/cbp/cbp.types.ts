@@ -1,36 +1,79 @@
-// Types for CBP API
+// CBP API response types & my own reformatted types
+
+//===== CBP API response types (raw from api)
 export interface CBPLane {
   update_time: string;
   operational_status: string;
   delay_minutes: string;
   lanes_open: string;
 }
-
+// passenger vehicles
+export interface CBPPassengerVehicleLanes {
+  standard_lanes: CBPLane;
+  NEXUS_SENTRI_lanes: CBPLane;
+  ready_lanes: CBPLane;
+}
+// pedestrian lanes
+export interface CBPPedestrianLanes {
+  standard_lanes: CBPLane;
+  ready_lanes: CBPLane;
+}
+// compolete port data from CBP API
 export interface CBPPort {
   port_number: string;
-  border: string;
-  port_name: string;
-  crossing_name: string;
+  border: string; // "Mexican Border" or "Canadian Border"
+  port_name: string; // US port name
+  crossing_name: string; // specific crossing ex: PedWest
+  hours: string; // operating hours
+  date: string; // last update data
+  time: string; // last update time
+  port_status: string; // "Open" "Closed"
+  construction_notice: string; // notices or alerts from CBP about the port
+  passenger_vehicle_lanes: CBPPassengerVehicleLanes;
+  pedestrian_lanes: CBPPedestrianLanes;
+}
+
+//===== My reformated types
+export interface ReformattedLane {
+  updateTime: string;
+  operationalStatus: string;
+  // delayMinutes: number | 'N/A'; // 'N/A' = data unavailable, not 0
+  delayMinutes: number;
+  // lanesOpen: number | 'N/A'; // 'N/A' = data unavailable, not 0
+  lanesOpen: number;
+}
+
+export interface ReformattedPassengerVehicleLanes {
+  standard: ReformattedLane;
+  sentri: ReformattedLane;
+  ready: ReformattedLane;
+}
+
+export interface ReformattedPedestrianLanes {
+  standard: ReformattedLane;
+  ready: ReformattedLane;
+}
+
+export interface ReformattedCrossing {
+  // Unique identifier
+  portNumber: string;
+  // where traveler is crossing from
+  originCountry: 'MX' | 'CA';
+  originCity: string;
+  // where traveler is going
+  destinationCity: string;
+  // CBP port name & crossing name
+  portName: string;
+  crossingName: string;
+
+  // Operational info
   hours: string;
   date: string;
   time: string;
-  port_status: string;
-  construction_notice: string;
-  passenger_vehicle_lanes: {
-    standard_lanes: CBPLane;
-    NEXUS_SENTRI_lanes: CBPLane;
-    ready_lanes: CBPLane;
-  };
-  pedestrian_lanes: {
-    standard_lanes: CBPLane;
-    ready_lanes: CBPLane;
-  };
-}
+  portStatus: string;
+  constructionNotice: string;
 
-// Type for our parsed lane data
-export interface ParsedLane {
-  updateTime: string;
-  operationalStatus: string;
-  delayMinutes: number;
-  lanesOpen: number;
+  // Wait time data
+  passengerVehicle: ReformattedPassengerVehicleLanes;
+  pedestrian: ReformattedPedestrianLanes;
 }

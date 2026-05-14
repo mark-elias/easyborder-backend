@@ -42,3 +42,7 @@ export class Crossing extends Document {
 }
 
 export const CrossingSchema = SchemaFactory.createForClass(Crossing);
+
+// indexing
+CrossingSchema.index({ portNumber: 1 });
+CrossingSchema.index({ originCountry: 1, originCity: 1 });

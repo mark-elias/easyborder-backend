@@ -9,6 +9,12 @@ export class WaitTimeService {
     @InjectModel(WaitTime.name) private waitTimeModel: Model<WaitTime>,
   ) {}
 
+  // get wait times for a specific crossing
+  async getForCrossing(crossingId: string): Promise<WaitTime | null> {
+    return this.waitTimeModel.findOne({ crossing: crossingId }).exec();
+  }
+
+  //===== used by CBP service
   // Delete all old wait times
   async deleteAll(): Promise<void> {
     await this.waitTimeModel.deleteMany({});
@@ -19,16 +25,5 @@ export class WaitTimeService {
     const waitTime = new this.waitTimeModel(waitTimeData);
     return waitTime.save();
   }
-
-  // Get current wait time for a crossing
-  async getCurrentForCrossing(crossingId: string): Promise<WaitTime | null> {
-    return this.waitTimeModel
-      .findOne({ crossing: crossingId, isCurrent: true })
-      .exec();
-  }
-
-  // Get current wait time by port number
-  async getCurrentByPortNumber(portNumber: string): Promise<WaitTime | null> {
-    return this.waitTimeModel.findOne({ portNumber, isCurrent: true }).exec();
-  }
+  //=====
 }

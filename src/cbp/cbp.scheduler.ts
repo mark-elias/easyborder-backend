@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron } from '@nestjs/schedule';
 import { CbpService } from './cbp.service';
 
 @Injectable()
 export class CbpScheduler {
   constructor(private cbpService: CbpService) {}
 
-  // run every 30 mins
-  @Cron(CronExpression.EVERY_30_MINUTES)
+  // run every 15 mins
+  @Cron('*/15 * * * *')
   async fetchWaitTime() {
     try {
       console.log('running scheduled cbp api fetch');

@@ -68,8 +68,8 @@ export interface ReformattedCrossing {
 
   // Operational info
   hours: string;
-  date: string;
-  time: string;
+  cbpLastUpdateDate: string;
+  cbpLastUpdateTime: string;
   portStatus: string;
   constructionNotice: string;
 

@@ -80,8 +80,8 @@ export class CbpService {
       portName: port.port_name,
       crossingName: port.crossing_name,
       hours: port.hours,
-      date: port.date,
-      time: port.time,
+      cbpLastUpdateDate: port.date,
+      cbpLastUpdateTime: port.time,
       portStatus: port.port_status,
       constructionNotice: port.construction_notice,
       passengerVehicle: {
@@ -119,8 +119,8 @@ export class CbpService {
         portName: data.portName,
         crossingName: data.crossingName,
         hours: data.hours,
-        date: data.date,
-        time: data.time,
+        cbpLastUpdateDate: data.cbpLastUpdateDate,
+        cbpLastUpdateTime: data.cbpLastUpdateTime,
         portStatus: data.portStatus,
         constructionNotice: data.constructionNotice,
       });
@@ -131,8 +131,8 @@ export class CbpService {
       originCountry: data.originCountry,
       originCity: data.originCity,
       destinationCity: data.destinationCity,
-      date: data.date,
-      time: data.time,
+      cbpLastUpdateDate: data.cbpLastUpdateDate,
+      cbpLastUpdateTime: data.cbpLastUpdateTime,
       portStatus: data.portStatus,
       constructionNotice: data.constructionNotice,
     });

@@ -15,9 +15,6 @@ export class WaitTime extends Document {
   // @Prop({ required: true })
   // portNumber: string;
 
-  @Prop({ required: true })
-  fetchedAt: Date;
-
   // @Prop({ default: true })
   // isCurrent: boolean;
 

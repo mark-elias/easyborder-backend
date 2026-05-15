@@ -12,7 +12,7 @@ import { Throttle } from '@nestjs/throttler';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('register')
   registerUser(
     @Body() createUserDto: CreateUserDto,
@@ -26,14 +26,17 @@ export class AuthController {
     return this.authService.loginUser(loginUserDto);
   }
 
+  //===== testing routes
   // protected route
   // @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Get('private-route')
   getExampleRoute(): string {
     return 'Hello World';
   }
 
   @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Get('public-route')
   getPublicRoute(): string {
     return 'This is a public route';

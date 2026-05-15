@@ -7,7 +7,7 @@ export class CrossingController {
   constructor(private crossingService: CrossingService) {}
 
   // GET /crossings?originCountry=MX&originCity=Tijuana
-  @Throttle({ default: { limit: 5, ttl: 60000 } }) // max 5 req per min
+  @Throttle({ default: { limit: 50, ttl: 60000 } }) // max 5 req per min
   @Get()
   async getCrossings(
     @Query('originCountry') originCountry: string,

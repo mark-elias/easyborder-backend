@@ -8,7 +8,7 @@ export class WaitTimeController {
 
   // get waittimes by specific crossing
   // /api/wait-times/:crossingId
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Throttle({ default: { limit: 50, ttl: 60000 } })
   @Get(':crossingId')
   async getForCrossing(@Param('crossingId') crossingId: string) {
     return this.waitTimeService.getForCrossing(crossingId);

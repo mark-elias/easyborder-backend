@@ -1,5 +1,7 @@
 // Ports to skip (duplicates/unused)
-export const SKIP_PORTS = ['250608', '250609', '240207', '231002', '230103'];
+// export const SKIP_PORTS = ['250608', '250609', '240207', '231002', '230103'];
+export const SKIP_PORTS = ['240207', '231002', '230103'];
+// export const SKIP_PORTS: string[] = [];
 
 // US port name → mexican origin city
 export const MEXICO_ORIGIN_CITY_MAP: Record<string, string> = {

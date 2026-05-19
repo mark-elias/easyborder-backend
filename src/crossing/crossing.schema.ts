@@ -29,6 +29,21 @@ export class Crossing extends Document {
   @Prop()
   constructionNotice: string;
 
+  // lane types
+  @Prop({ default: false })
+  hasCommercialLanes: boolean;
+  @Prop({ default: false })
+  hasPassengerLanes: boolean;
+  @Prop({ default: false })
+  hasPedestrianLanes: boolean;
+  // max lanes
+  @Prop({ default: 0 })
+  maxCommercialLanes: number;
+  @Prop({ default: 0 })
+  maxPassengerLanes: number;
+  @Prop({ default: 0 })
+  maxPedestrianLanes: number;
+
   // CBPs last update timestamp (from their API)
   @Prop()
   cbpLastUpdateDate: string;

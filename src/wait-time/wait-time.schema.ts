@@ -18,9 +18,26 @@ export class WaitTime extends Document {
   // @Prop({ default: true })
   // isCurrent: boolean;
 
-  // vehicle lanes
+  // Commercial lanes
   @Prop({ type: Object })
-  passengerVehicle: {
+  commercial: {
+    standard: {
+      updateTime: string;
+      operationalStatus: string;
+      delayMinutes: number;
+      lanesOpen: number;
+    };
+    fast: {
+      updateTime: string;
+      operationalStatus: string;
+      delayMinutes: number;
+      lanesOpen: number;
+    };
+  };
+
+  // passenger lanes
+  @Prop({ type: Object })
+  passenger: {
     standard: {
       updateTime: string;
       operationalStatus: string;

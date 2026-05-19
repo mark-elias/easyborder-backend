@@ -52,12 +52,16 @@ export class CbpService {
       const reformatted = this.transformPort(port);
       const crossing = await this.saveOrUpdateCrossing(reformatted);
 
-      // create waittime for crossing
+      // create waittime for crossing - only include lanes that exist
       await this.waitTimeService.create({
         crossing: crossing._id,
-        commercial: reformatted.commercial,
-        passenger: reformatted.passenger,
-        pedestrian: reformatted.pedestrian,
+        ...(reformatted.commercial && {
+          commercial: reformatted.commercial,
+        }),
+        ...(reformatted.passenger && {
+          passenger: reformatted.passenger,
+        }),
+        ...(reformatted.pedestrian && { pedestrian: reformatted.pedestrian }),
       });
     } catch (error: unknown) {
       console.error(`❌ Failed to save crossing ${port.port_number}:`, error);
@@ -100,19 +104,33 @@ export class CbpService {
       maxPedestrianLanes: maxPedestrian,
 
       constructionNotice: port.construction_notice,
-      passenger: {
-        standard: this.reformatLane(
-          port.passenger_vehicle_lanes?.standard_lanes,
-        ),
-        sentri: this.reformatLane(
-          port.passenger_vehicle_lanes?.NEXUS_SENTRI_lanes,
-        ),
-        ready: this.reformatLane(port.passenger_vehicle_lanes?.ready_lanes),
-      },
-      pedestrian: {
-        standard: this.reformatLane(port.pedestrian_lanes?.standard_lanes),
-        ready: this.reformatLane(port.pedestrian_lanes?.ready_lanes),
-      },
+
+      // Only include lane data if crossing has that type
+      ...(maxCommercial > 0 && {
+        commercial: {
+          standard: this.reformatLane(
+            port.commercial_vehicle_lanes?.standard_lanes,
+          ),
+          fast: this.reformatLane(port.commercial_vehicle_lanes?.FAST_lanes),
+        },
+      }),
+      ...(maxPassenger > 0 && {
+        passenger: {
+          standard: this.reformatLane(
+            port.passenger_vehicle_lanes?.standard_lanes,
+          ),
+          sentri: this.reformatLane(
+            port.passenger_vehicle_lanes?.NEXUS_SENTRI_lanes,
+          ),
+          ready: this.reformatLane(port.passenger_vehicle_lanes?.ready_lanes),
+        },
+      }),
+      ...(maxPedestrian > 0 && {
+        pedestrian: {
+          standard: this.reformatLane(port.pedestrian_lanes?.standard_lanes),
+          ready: this.reformatLane(port.pedestrian_lanes?.ready_lanes),
+        },
+      }),
     };
   }
 

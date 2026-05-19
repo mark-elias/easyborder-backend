@@ -19,8 +19,9 @@ export class WaitTime extends Document {
   // isCurrent: boolean;
 
   // Commercial lanes
-  @Prop({ type: Object })
-  commercial: {
+  // optional, only if crossing has commercial lanes
+  @Prop({ type: Object, required: false })
+  commercial?: {
     standard: {
       updateTime: string;
       operationalStatus: string;
@@ -36,8 +37,9 @@ export class WaitTime extends Document {
   };
 
   // passenger lanes
-  @Prop({ type: Object })
-  passenger: {
+  // optional, only if crossing has passenger lanes
+  @Prop({ type: Object, required: false })
+  passenger?: {
     standard: {
       updateTime: string;
       operationalStatus: string;
@@ -59,8 +61,9 @@ export class WaitTime extends Document {
   };
 
   // Pedestrian Lanes
-  @Prop({ type: Object })
-  pedestrian: {
+  // optional, only if crossing has pedestrian lanes
+  @Prop({ type: Object, required: false })
+  pedestrian?: {
     standard: {
       updateTime: string;
       operationalStatus: string;

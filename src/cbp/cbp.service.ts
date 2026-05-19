@@ -55,10 +55,8 @@ export class CbpService {
       // create waittime for crossing
       await this.waitTimeService.create({
         crossing: crossing._id,
-        portNumber: port.port_number,
-        fetchedAt: new Date(),
-        isCurrent: true,
-        passengerVehicle: reformatted.passengerVehicle,
+        commercial: reformatted.commercial,
+        passenger: reformatted.passenger,
         pedestrian: reformatted.pedestrian,
       });
     } catch (error: unknown) {
@@ -72,6 +70,17 @@ export class CbpService {
     const originCountry = port.border === 'Mexican Border' ? 'MX' : 'CA';
     const originCity = getOriginCity(port.port_name, originCountry);
 
+    // maximum lanes
+    const maxCommercial = this.parseMaxLanes(
+      port.commercial_vehicle_lanes?.maximum_lanes,
+    );
+    const maxPassenger = this.parseMaxLanes(
+      port.passenger_vehicle_lanes?.maximum_lanes,
+    );
+    const maxPedestrian = this.parseMaxLanes(
+      port.pedestrian_lanes?.maximum_lanes,
+    );
+
     return {
       portNumber: port.port_number,
       originCountry,
@@ -83,8 +92,15 @@ export class CbpService {
       cbpLastUpdateDate: port.date,
       cbpLastUpdateTime: port.time,
       portStatus: port.port_status,
+      hasCommercialLanes: maxCommercial > 0,
+      hasPassengerLanes: maxPassenger > 0,
+      hasPedestrianLanes: maxPedestrian > 0,
+      maxCommercialLanes: maxCommercial,
+      maxPassengerLanes: maxPassenger,
+      maxPedestrianLanes: maxPedestrian,
+
       constructionNotice: port.construction_notice,
-      passengerVehicle: {
+      passenger: {
         standard: this.reformatLane(
           port.passenger_vehicle_lanes?.standard_lanes,
         ),
@@ -122,6 +138,13 @@ export class CbpService {
         cbpLastUpdateDate: data.cbpLastUpdateDate,
         cbpLastUpdateTime: data.cbpLastUpdateTime,
         portStatus: data.portStatus,
+        hasCommercialLanes: data.hasCommercialLanes,
+        hasPassengerLanes: data.hasPassengerLanes,
+        hasPedestrianLanes: data.hasPedestrianLanes,
+        maxCommercialLanes: data.maxCommercialLanes,
+        maxPassengerLanes: data.maxPassengerLanes,
+        maxPedestrianLanes: data.maxPedestrianLanes,
+
         constructionNotice: data.constructionNotice,
       });
     }
@@ -134,6 +157,13 @@ export class CbpService {
       cbpLastUpdateDate: data.cbpLastUpdateDate,
       cbpLastUpdateTime: data.cbpLastUpdateTime,
       portStatus: data.portStatus,
+      hasCommercialLanes: data.hasCommercialLanes,
+      hasPassengerLanes: data.hasPassengerLanes,
+      hasPedestrianLanes: data.hasPedestrianLanes,
+      maxCommercialLanes: data.maxCommercialLanes,
+      maxPassengerLanes: data.maxPassengerLanes,
+      maxPedestrianLanes: data.maxPedestrianLanes,
+
       constructionNotice: data.constructionNotice,
     });
   }
@@ -155,5 +185,10 @@ export class CbpService {
       delayMinutes: Number(lane.delay_minutes) || 0,
       lanesOpen: Number(lane.lanes_open) || 0,
     };
+  }
+
+  private parseMaxLanes(value?: string): number {
+    if (!value || value === 'N/A') return 0;
+    return parseInt(value, 10) || 0;
   }
 }

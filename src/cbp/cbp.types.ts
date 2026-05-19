@@ -7,14 +7,22 @@ export interface CBPLane {
   delay_minutes: string;
   lanes_open: string;
 }
+// commercial
+export interface CBPCommercialVehicleLanes {
+  maximum_lanes: string;
+  standard_lanes: CBPLane;
+  FAST_lanes: CBPLane;
+}
 // passenger vehicles
 export interface CBPPassengerVehicleLanes {
+  maximum_lanes: string;
   standard_lanes: CBPLane;
   NEXUS_SENTRI_lanes: CBPLane;
   ready_lanes: CBPLane;
 }
 // pedestrian lanes
 export interface CBPPedestrianLanes {
+  maximum_lanes: string;
   standard_lanes: CBPLane;
   ready_lanes: CBPLane;
 }
@@ -29,6 +37,7 @@ export interface CBPPort {
   time: string; // last update time
   port_status: string; // "Open" "Closed"
   construction_notice: string; // notices or alerts from CBP about the port
+  commercial_vehicle_lanes: CBPCommercialVehicleLanes;
   passenger_vehicle_lanes: CBPPassengerVehicleLanes;
   pedestrian_lanes: CBPPedestrianLanes;
 }
@@ -43,7 +52,12 @@ export interface ReformattedLane {
   lanesOpen: number;
 }
 
-export interface ReformattedPassengerVehicleLanes {
+export interface ReformattedCommercialLanes {
+  standard: ReformattedLane;
+  fast: ReformattedLane;
+}
+
+export interface ReformattedPassengerLanes {
   standard: ReformattedLane;
   sentri: ReformattedLane;
   ready: ReformattedLane;
@@ -73,7 +87,15 @@ export interface ReformattedCrossing {
   portStatus: string;
   constructionNotice: string;
 
+  hasCommercialLanes: boolean;
+  hasPassengerLanes: boolean;
+  hasPedestrianLanes: boolean;
+  maxCommercialLanes: number;
+  maxPassengerLanes: number;
+  maxPedestrianLanes: number;
+
   // Wait time data
-  passengerVehicle: ReformattedPassengerVehicleLanes;
-  pedestrian: ReformattedPedestrianLanes;
+  commercial?: ReformattedCommercialLanes;
+  passenger?: ReformattedPassengerLanes;
+  pedestrian?: ReformattedPedestrianLanes;
 }

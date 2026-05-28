@@ -22,12 +22,7 @@ import { CbpModule } from './cbp/cbp.module';
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
     }),
-    MongooseModule.forRoot(process.env.DATABASE_URL || '', {
-      onConnectionCreate: (connection) => {
-        console.log('🌱 Database connected');
-        return connection;
-      },
-    }),
+    MongooseModule.forRoot(process.env.DATABASE_URL || ''),
     ThrottlerModule.forRoot([
       {
         ttl: 60000, // 1 minute window

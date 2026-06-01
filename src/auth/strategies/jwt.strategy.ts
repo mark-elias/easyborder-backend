@@ -9,6 +9,7 @@ import { User } from 'src/user/schemas/user.schema';
 // for auth
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { Request } from 'express';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -17,9 +18,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private userModel: Model<User>,
     private configService: ConfigService,
   ) {
-    // 🚨 had to add this incase the secret is not set in the environment variables
-    // const jwtSecret = process.env.JWT_SECRET;
-
     // get the jwt secret from the environment variables
     const jwtSecret = configService.get<string>('JWT_SECRET');
     if (!jwtSecret) {
@@ -27,15 +25,21 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     super({
-      // the function to extract the token from the request
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      // the secret key to verify the token
+      // extract jwt from cookie
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (req: Request): string | null => {
+          return (req?.cookies?.access_token as string) || null;
+        },
+        // fallback to auth header
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ]),
+      ignoreExpiration: false,
+      // secret key to verify tooken
       secretOrKey: jwtSecret,
     });
   }
 
   // validate the token
-  // 🚨 had to add the types to the payload to avoid type errors
   async validate(payload: { id: string; iat: number; exp: number }) {
     // get user id from payload (id is the user id from the token)
     const { id } = payload;
@@ -45,7 +49,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException('Invalid token or user not found');
     }
-    // return the user
+    // return the user (req.user)
     return user;
   }
 }

@@ -33,8 +33,8 @@ export class AuthController {
   ) {
     const { token } = await this.authService.registerUser(createUserDto);
 
-    // cookie
-    res.cookie('access_token', token, {
+    // tells the broswer to store jwt in a cookie
+    res.cookie('auth_token', token, {
       // reject jaavascript access (XSS)
       httpOnly: true,
       // only send cookie over HTTPS
@@ -55,8 +55,8 @@ export class AuthController {
   ) {
     const { token } = await this.authService.loginUser(loginUserDto);
 
-    // cookie
-    res.cookie('access_token', token, {
+    // tells the broswer to store jwt in a cookie
+    res.cookie('auth_token', token, {
       // reject jaavascript access (XSS)
       httpOnly: true,
       // only send cookie over HTTPS

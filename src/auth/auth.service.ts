@@ -27,13 +27,14 @@ export class AuthService {
 
   async registerUser(createUserDto: CreateUserDto): Promise<{ token: string }> {
     // get user data from createUserDto
-    const { email, password } = createUserDto;
+    const { email, password, username } = createUserDto;
 
     try {
       // use user service to create user
       const user = await this.userService.create({
         email,
         password: await bcrypt.hash(password, 10),
+        ...(username && { username }),
       });
 
       // generate token

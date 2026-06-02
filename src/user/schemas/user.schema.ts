@@ -8,7 +8,8 @@ export class User extends Document {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: true })
+  // dont automatically send password when getting a user
+  @Prop({ required: true, select: false })
   password: string;
 
   @Prop()

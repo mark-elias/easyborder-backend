@@ -53,7 +53,8 @@ export class AuthService {
     const { email, password } = loginUserDto;
 
     // check if user exists
-    const user = await this.userModel.findOne({ email });
+    // select the password bc its not automatically sent when getting a user
+    const user = await this.userModel.findOne({ email }).select('+password');
     // if user does not exist, throw an error
     if (!user) {
       throw new UnauthorizedException('Invalid Credentials');

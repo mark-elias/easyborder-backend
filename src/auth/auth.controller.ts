@@ -37,8 +37,8 @@ export class AuthController {
     res.cookie('auth_token', token, {
       // reject jaavascript access (XSS)
       httpOnly: true,
-      // only send cookie over HTTPS
-      secure: this.configService.get('NODE_ENV') === 'production',
+      // only send cookie over HTTPS or localhost
+      secure: true,
       // allow cross origin requests (my vercel to EC2)
       sameSite: 'none',
       maxAge: 7 * 24 * 60 * 1000, // 7 days
@@ -59,8 +59,8 @@ export class AuthController {
     res.cookie('auth_token', token, {
       // reject jaavascript access (XSS)
       httpOnly: true,
-      // only send cookie over HTTPS
-      secure: process.env.NODE_ENV === 'production',
+      // only send cookie over HTTPS or localhost
+      secure: true,
       // allow cross origin requests (my vercel to EC2)
       sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days

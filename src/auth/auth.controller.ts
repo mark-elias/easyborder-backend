@@ -75,9 +75,8 @@ export class AuthController {
     return { user: req.user };
   }
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 logouts per minute
   @Post('logout')
-  // only logged in users can logout
-  @UseGuards(JwtAuthGuard)
   logout(@Res({ passthrough: true }) res: Response) {
     // clear cookie with options it was set with
     res.clearCookie('auth_token', {

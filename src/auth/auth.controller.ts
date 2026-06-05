@@ -75,10 +75,17 @@ export class AuthController {
     return { user: req.user };
   }
 
-  //===== testing routes
+  @Post('logout')
+  // only logged in users can logout
   @UseGuards(JwtAuthGuard)
-  @Get('protected-test')
-  getProtectedRoute(): string {
-    return 'You are authenticated';
+  logout(@Res({ passthrough: true }) res: Response) {
+    // clear cookie with options it was set with
+    res.clearCookie('auth_token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    });
+
+    return { success: true, message: 'Logged out successfully' };
   }
 }

@@ -5,6 +5,7 @@ import {
   Body,
   Request,
   UseGuards,
+  Get,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
@@ -42,5 +43,11 @@ export class UserController {
       body.laneCategory,
       body.laneType,
     );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('favorites')
+  async getFavorites(@Request() req: { user: User }) {
+    return this.userService.getFavorites(req.user._id.toString());
   }
 }

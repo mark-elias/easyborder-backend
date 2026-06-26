@@ -56,4 +56,9 @@ export class UserService {
       { new: true },
     );
   }
+
+  async getFavorites(userId: string) {
+    const user = await this.userModel.findById(userId).select('favorites');
+    return user?.favorites ?? [];
+  }
 }

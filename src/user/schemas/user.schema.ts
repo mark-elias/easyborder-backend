@@ -19,7 +19,6 @@ export class User extends Document {
   @Prop({
     type: [
       {
-        _id: false,
         crossingId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Crossing',
@@ -32,6 +31,7 @@ export class User extends Document {
     default: [],
   })
   favorites: {
+    _id: mongoose.Types.ObjectId;
     crossingId: mongoose.Schema.Types.ObjectId;
     laneCategory: string;
     laneType: string;

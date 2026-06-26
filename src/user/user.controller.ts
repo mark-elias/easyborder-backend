@@ -6,6 +6,7 @@ import {
   Request,
   UseGuards,
   Get,
+  Param,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
@@ -31,17 +32,14 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete('favorites')
+  @Delete('favorites/:favoriteId')
   async removeFavorite(
     @Request() req: { user: User },
-    @Body()
-    body: { crossingId: string; laneCategory: string; laneType: string },
+    @Param('favoriteId') favoriteId: string,
   ) {
     return this.userService.removeFavoriteWaitTime(
       req.user._id.toString(),
-      body.crossingId,
-      body.laneCategory,
-      body.laneType,
+      favoriteId,
     );
   }
 

@@ -51,17 +51,19 @@ export class UserService {
 
   async removeFavoriteWaitTime(
     userId: string,
-    crossingId: string,
-    laneCategory: string,
-    laneType: string,
+    favoriteId: string,
   ): Promise<User | null> {
+    const user = await this.userModel.findById(userId).select('favorites');
+
+    const exists = user?.favorites.some((f) => f._id.toString() === favoriteId);
+
+    if (!exists) {
+      throw new BadRequestException('Favorite not found');
+    }
+
     return this.userModel.findByIdAndUpdate(
       userId,
-      {
-        $pull: {
-          favorites: { crossingId, laneCategory, laneType },
-        },
-      },
+      { $pull: { favorites: { _id: new Types.ObjectId(favoriteId) } } },
       { new: true },
     );
   }

@@ -22,4 +22,38 @@ export class UserService {
     const newUser = new this.userModel(user);
     return newUser.save();
   }
+
+  async addFavoriteWaitTime(
+    userId: string,
+    crossingId: string,
+    laneCategory: string,
+    laneType: string,
+  ): Promise<User | null> {
+    return this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $addToSet: {
+          favorites: { crossingId, laneCategory, laneType },
+        },
+      },
+      { new: true },
+    );
+  }
+
+  async removeFavoriteWaitTime(
+    userId: string,
+    crossingId: string,
+    laneCategory: string,
+    laneType: string,
+  ): Promise<User | null> {
+    return this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $pull: {
+          favorites: { crossingId, laneCategory, laneType },
+        },
+      },
+      { new: true },
+    );
+  }
 }

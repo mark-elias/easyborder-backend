@@ -11,6 +11,7 @@ import {
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { User } from './schemas/user.schema';
+import { AddFavoriteDto } from './DTOs/add-favorite.dto';
 
 @Controller('user')
 export class UserController {
@@ -20,8 +21,7 @@ export class UserController {
   @Post('favorites')
   async addFavorite(
     @Request() req: { user: User },
-    @Body()
-    body: { crossingId: string; laneCategory: string; laneType: string },
+    @Body() body: AddFavoriteDto,
   ) {
     return this.userService.addFavoriteWaitTime(
       req.user._id.toString(),

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { User } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateUserDto } from './DTOs/create-user.dto';
 
 @Injectable()
@@ -29,13 +29,22 @@ export class UserService {
     laneCategory: string,
     laneType: string,
   ): Promise<User | null> {
+    const user = await this.userModel.findById(userId).select('favorites');
+
+    const alreadyFavorited = user?.favorites.some(
+      (f) =>
+        (f.crossingId as unknown as Types.ObjectId).equals(crossingId) &&
+        f.laneCategory === laneCategory &&
+        f.laneType === laneType,
+    );
+
+    if (alreadyFavorited) {
+      throw new BadRequestException('Favorite already exists');
+    }
+
     return this.userModel.findByIdAndUpdate(
       userId,
-      {
-        $addToSet: {
-          favorites: { crossingId, laneCategory, laneType },
-        },
-      },
+      { $push: { favorites: { crossingId, laneCategory, laneType } } },
       { new: true },
     );
   }

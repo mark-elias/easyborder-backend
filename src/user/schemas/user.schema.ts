@@ -19,6 +19,7 @@ export class User extends Document {
   @Prop({
     type: [
       {
+        _id: false,
         crossingId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Crossing',

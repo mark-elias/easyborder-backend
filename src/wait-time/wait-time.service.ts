@@ -11,7 +11,10 @@ export class WaitTimeService {
 
   // get wait times for a specific crossing
   async getForCrossing(crossingId: string): Promise<WaitTime | null> {
-    return this.waitTimeModel.findOne({ crossing: crossingId }).exec();
+    return this.waitTimeModel
+      .findOne({ crossing: crossingId })
+      .populate('crossing', '_id portName crossingName')
+      .exec();
   }
 
   //===== used by CBP service
@@ -25,5 +28,5 @@ export class WaitTimeService {
     const waitTime = new this.waitTimeModel(waitTimeData);
     return waitTime.save();
   }
-  //=====
+  //===============
 }

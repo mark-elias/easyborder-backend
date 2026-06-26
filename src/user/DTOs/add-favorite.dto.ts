@@ -1,24 +1,14 @@
 import { IsEnum, IsMongoId } from 'class-validator';
+import { TravelerType, LaneType } from '../enums/favorite.enums';
 
-export enum LaneCategory {
-  PASSENGER = 'passenger',
-  PEDESTRIAN = 'pedestrian',
-  COMMERCIAL = 'commercial',
-}
-
-export enum LaneType {
-  STANDARD = 'standard',
-  SENTRI = 'sentri',
-  READY = 'ready',
-  FAST = 'fast',
-}
+export { TravelerType, LaneType };
 
 export class AddFavoriteDto {
   @IsMongoId()
   crossingId: string;
 
-  @IsEnum(LaneCategory)
-  laneCategory: LaneCategory;
+  @IsEnum(TravelerType)
+  travelerType: TravelerType;
 
   @IsEnum(LaneType)
   laneType: LaneType;

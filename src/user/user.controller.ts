@@ -26,7 +26,7 @@ export class UserController {
     return this.userService.addFavoriteWaitTime(
       req.user._id.toString(),
       body.crossingId,
-      body.laneCategory,
+      body.travelerType,
       body.laneType,
     );
   }

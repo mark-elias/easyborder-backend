@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
+import { TravelerType, LaneType } from '../enums/favorite.enums';
 
 @Schema({
   timestamps: true,
@@ -24,8 +25,16 @@ export class User extends Document {
           ref: 'Crossing',
           required: true,
         },
-        laneCategory: { type: String, required: true },
-        laneType: { type: String, required: true },
+        travelerType: {
+          type: String,
+          required: true,
+          enum: Object.values(TravelerType),
+        },
+        laneType: {
+          type: String,
+          required: true,
+          enum: Object.values(LaneType),
+        },
       },
     ],
     default: [],
@@ -33,7 +42,7 @@ export class User extends Document {
   favorites: {
     _id: mongoose.Types.ObjectId;
     crossingId: mongoose.Schema.Types.ObjectId;
-    laneCategory: string;
+    travelerType: string;
     laneType: string;
   }[];
 }

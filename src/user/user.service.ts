@@ -26,7 +26,7 @@ export class UserService {
   async addFavoriteWaitTime(
     userId: string,
     crossingId: string,
-    laneCategory: string,
+    travelerType: string,
     laneType: string,
   ): Promise<User | null> {
     const user = await this.userModel.findById(userId).select('favorites');
@@ -34,7 +34,7 @@ export class UserService {
     const alreadyFavorited = user?.favorites.some(
       (f) =>
         (f.crossingId as unknown as Types.ObjectId).equals(crossingId) &&
-        f.laneCategory === laneCategory &&
+        f.travelerType === travelerType &&
         f.laneType === laneType,
     );
 
@@ -44,7 +44,7 @@ export class UserService {
 
     return this.userModel.findByIdAndUpdate(
       userId,
-      { $push: { favorites: { crossingId, laneCategory, laneType } } },
+      { $push: { favorites: { crossingId, travelerType, laneType } } },
       { new: true },
     );
   }

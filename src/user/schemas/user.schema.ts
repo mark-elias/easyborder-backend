@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import * as mongoose from 'mongoose';
 
 @Schema({
   timestamps: true,
@@ -14,6 +15,26 @@ export class User extends Document {
 
   @Prop()
   username: string;
+
+  @Prop({
+    type: [
+      {
+        crossingId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Crossing',
+          required: true,
+        },
+        laneCategory: { type: String, required: true },
+        laneType: { type: String, required: true },
+      },
+    ],
+    default: [],
+  })
+  favorites: {
+    crossingId: mongoose.Schema.Types.ObjectId;
+    laneCategory: string;
+    laneType: string;
+  }[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

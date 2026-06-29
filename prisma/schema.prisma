@@ -1,13 +1,80 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  password  String
+  username  String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  favorites Favorite[]
+}
+
+model Crossing {
+  id                 String     @id @default(cuid())
+  portNumber         String     @unique
+  portName           String
+  crossingName       String?
+  originCountry      String
+  originCity         String
+  destinationCity    String
+  portStatus         String?
+  hours              String?
+  constructionNotice String?
+  hasCommercialLanes Boolean    @default(false)
+  hasPassengerLanes  Boolean    @default(false)
+  hasPedestrianLanes Boolean    @default(false)
+  maxCommercialLanes Int        @default(0)
+  maxPassengerLanes  Int        @default(0)
+  maxPedestrianLanes Int        @default(0)
+  cbpLastUpdateDate  String?
+  cbpLastUpdateTime  String?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  waitTime           WaitTime?
+  favorites          Favorite[]
+}
+
+model WaitTime {
+  id         String   @id @default(cuid())
+  crossingId String   @unique
+  crossing   Crossing @relation(fields: [crossingId], references: [id], onDelete: Cascade)
+  commercial Json?
+  passenger  Json?
+  pedestrian Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Favorite {
+  id           String       @id @default(cuid())
+  userId       String
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  crossingId   String
+  crossing     Crossing     @relation(fields: [crossingId], references: [id], onDelete: Cascade)
+  travelerType TravelerType
+  laneType     LaneType
+  createdAt    DateTime     @default(now())
+
+  @@unique([userId, crossingId, travelerType, laneType])
+}
+
+enum TravelerType {
+  passenger
+  pedestrian
+  commercial
+}
+
+enum LaneType {
+  standard
+  sentri
+  ready
+  fast
 }

@@ -35,11 +35,11 @@ actually happening at the border before you leave the house.
 
 **Backend:** TypeScript, Nest.js
 
-**Data:** MongoDB (currently migrating to PostgreSQL), AWS S3 (planned)
+**Database:** MongoDB (currently migrating to PostgreSQL)
 
 **Auth:** Passport.js, jwts, cookies
 
-**Infra:** AWS EC2, Nginx, Docker Compose, Github Actions
+**Infra:** AWS EC2, AWS S3 (planned), Nginx, Docker Compose, Github Actions
 
 ## Architecture
 ```

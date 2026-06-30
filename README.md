@@ -33,7 +33,9 @@ actually happening at the border before you leave the house.
 ## Tech Stack
 **Frontend:** Typescript, Next.js, Tailwind, Shadcn, Bun, Tanstack Query, React-Hook-Form, Zod, Zustand
 
-**Backend:** TypeScript, Nest.js, MongoDB
+**Backend:** TypeScript, Nest.js
+
+**Data:** MongoDB (currently migrating to PostgreSQL), AWS S3 (planned)
 
 **Auth:** Passport.js, jwts, cookies
 

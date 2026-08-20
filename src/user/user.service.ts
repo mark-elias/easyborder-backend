@@ -1,75 +1,69 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { User } from './schemas/user.schema';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './DTOs/create-user.dto';
+import { TravelerType, LaneType } from './enums/favorite.enums';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(private prisma: PrismaService) {}
 
-  async create(user: CreateUserDto): Promise<User> {
-    // check if user already exists
-    const existingUser = await this.userModel.findOne({
-      email: user.email,
+  async create(user: CreateUserDto) {
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: user.email },
     });
 
     if (existingUser) {
       throw new BadRequestException('User with this email already exists');
     }
 
-    // create user in the database
-    const newUser = new this.userModel(user);
-    return newUser.save();
+    return this.prisma.user.create({
+      data: user,
+    });
   }
 
   async addFavoriteWaitTime(
     userId: string,
     crossingId: string,
-    travelerType: string,
-    laneType: string,
-  ): Promise<User | null> {
-    const user = await this.userModel.findById(userId).select('favorites');
+    travelerType: TravelerType,
+    laneType: LaneType,
+  ) {
+    const existing = await this.prisma.favorite.findUnique({
+      where: {
+        userId_crossingId_travelerType_laneType: {
+          userId,
+          crossingId,
+          travelerType,
+          laneType,
+        },
+      },
+    });
 
-    const alreadyFavorited = user?.favorites.some(
-      (f) =>
-        (f.crossingId as unknown as Types.ObjectId).equals(crossingId) &&
-        f.travelerType === travelerType &&
-        f.laneType === laneType,
-    );
-
-    if (alreadyFavorited) {
+    if (existing) {
       throw new BadRequestException('Favorite already exists');
     }
 
-    return this.userModel.findByIdAndUpdate(
-      userId,
-      { $push: { favorites: { crossingId, travelerType, laneType } } },
-      { new: true },
-    );
+    return this.prisma.favorite.create({
+      data: { userId, crossingId, travelerType, laneType },
+    });
   }
 
-  async removeFavoriteWaitTime(
-    userId: string,
-    favoriteId: string,
-  ): Promise<User | null> {
-    const user = await this.userModel.findById(userId).select('favorites');
+  async removeFavoriteWaitTime(userId: string, favoriteId: string) {
+    const favorite = await this.prisma.favorite.findFirst({
+      where: { id: favoriteId, userId },
+    });
 
-    const exists = user?.favorites.some((f) => f._id.toString() === favoriteId);
-
-    if (!exists) {
+    if (!favorite) {
       throw new BadRequestException('Favorite not found');
     }
 
-    return this.userModel.findByIdAndUpdate(
-      userId,
-      { $pull: { favorites: { _id: new Types.ObjectId(favoriteId) } } },
-      { new: true },
-    );
+    return this.prisma.favorite.delete({
+      where: { id: favoriteId },
+    });
   }
 
   async getFavorites(userId: string) {
-    const user = await this.userModel.findById(userId).select('favorites');
-    return user?.favorites ?? [];
+    return this.prisma.favorite.findMany({
+      where: { userId },
+    });
   }
 }

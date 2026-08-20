@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
-import { User } from './schemas/user.schema';
+import { User } from '@prisma/client';
 import { AddFavoriteDto } from './DTOs/add-favorite.dto';
 
 @Controller('user')
@@ -24,7 +24,7 @@ export class UserController {
     @Body() body: AddFavoriteDto,
   ) {
     return this.userService.addFavoriteWaitTime(
-      req.user._id.toString(),
+      req.user.id,
       body.crossingId,
       body.travelerType,
       body.laneType,
@@ -37,15 +37,12 @@ export class UserController {
     @Request() req: { user: User },
     @Param('favoriteId') favoriteId: string,
   ) {
-    return this.userService.removeFavoriteWaitTime(
-      req.user._id.toString(),
-      favoriteId,
-    );
+    return this.userService.removeFavoriteWaitTime(req.user.id, favoriteId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('favorites')
   async getFavorites(@Request() req: { user: User }) {
-    return this.userService.getFavorites(req.user._id.toString());
+    return this.userService.getFavorites(req.user.id);
   }
 }

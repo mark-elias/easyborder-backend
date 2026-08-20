@@ -4,8 +4,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 // for environment variables
 import { ConfigModule } from '@nestjs/config';
-// for mongoDb
-import { MongooseModule } from '@nestjs/mongoose';
+// for postgreSQL
+import { PrismaModule } from './prisma/prisma.module';
 // rate limiting
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
@@ -22,7 +22,7 @@ import { CbpModule } from './cbp/cbp.module';
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
     }),
-    MongooseModule.forRoot(process.env.DATABASE_URL || ''),
+    PrismaModule,
     ThrottlerModule.forRoot([
       {
         ttl: 60000, // 1 minute window

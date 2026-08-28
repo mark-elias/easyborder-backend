@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Crossing } from './crossing.schema';
+import { Crossing, Prisma } from '@prisma/client';
 
 @Injectable()
 export class CrossingService {
@@ -26,17 +26,20 @@ export class CrossingService {
   }
 
   // Create new crossing
-  async create(crossingData: Partial<Crossing>): Promise<Crossing> {
+  async create(crossingData: Prisma.CrossingCreateInput): Promise<Crossing> {
     return this.prisma.crossing.create({
-      data: crossingData as any,
+      data: crossingData,
     });
   }
 
   // Update existing crossing
-  async update(id: string, updates: Partial<Crossing>): Promise<Crossing> {
+  async update(
+    id: string,
+    updates: Prisma.CrossingUpdateInput,
+  ): Promise<Crossing> {
     return this.prisma.crossing.update({
       where: { id },
-      data: updates as any,
+      data: updates,
     });
   }
 }

@@ -3,8 +3,8 @@ import axios from 'axios';
 // services
 import { CrossingService } from '../crossing/crossing.service';
 import { WaitTimeService } from '../wait-time/wait-time.service';
-// schemas
-import { Crossing } from '../crossing/crossing.schema';
+// prisma
+import { Crossing } from '@prisma/client';
 // types
 import {
   CBPPort,
@@ -54,7 +54,7 @@ export class CbpService {
 
       // create waittime for crossing - only include lanes that exist
       await this.waitTimeService.create({
-        crossing: crossing._id,
+        crossingId: crossing.id,
         ...(reformatted.commercial && {
           commercial: reformatted.commercial,
         }),
@@ -168,7 +168,7 @@ export class CbpService {
     }
 
     // if crossing exists, update it
-    return await this.crossingService.update(crossing, {
+    return await this.crossingService.update(crossing.id, {
       originCountry: data.originCountry,
       originCity: data.originCity,
       destinationCity: data.destinationCity,

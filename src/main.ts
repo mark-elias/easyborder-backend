@@ -42,8 +42,8 @@ async function bootstrap() {
 
   // basic logging
   console.log(
-    `🚀 server running ... ENV: ${process.env.NODE_ENV}; PORT: ${port}; CORS: ${process.env.FRONTEND_URL}`,
+    `server running... ENV: ${process.env.NODE_ENV}; PORT: ${port}; CORS(frontend): ${process.env.FRONTEND_URL}`,
   );
-  console.log(`🌱 DB connected: ${process.env.DATABASE_URL ? '✅' : '❌'}`);
+  console.log(`DB url: ${process.env.DATABASE_URL ? '✅' : '❌'}`);
 }
 bootstrap();

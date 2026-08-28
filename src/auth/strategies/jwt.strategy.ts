@@ -1,11 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 // for environment variables
 import { ConfigService } from '@nestjs/config';
-// for mongoose
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
-// for user schema
-import { User } from 'src/user/schemas/user.schema';
+// prisma
+import { PrismaService } from 'src/prisma/prisma.service';
 // for auth
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -14,8 +11,7 @@ import { Request } from 'express';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    @InjectModel(User.name)
-    private userModel: Model<User>,
+    private prisma: PrismaService,
     private configService: ConfigService,
   ) {
     // get the jwt secret from the environment variables
@@ -42,9 +38,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   // validate the token
   async validate(payload: { id: string; iat: number; exp: number }) {
     // get user id from payload (id is the user id from the token)
-    const { id } = payload;
     // find the user in the database
-    const user = await this.userModel.findById(id);
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.id },
+    });
     // if user is not found, throw an error
     if (!user) {
       throw new UnauthorizedException('Invalid token or user not found');

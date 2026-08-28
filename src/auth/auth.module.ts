@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
-// for database
-import { MongooseModule } from '@nestjs/mongoose';
-// for environment variables
+// for env variables
 import { ConfigService } from '@nestjs/config';
 // for auth
 import { PassportModule } from '@nestjs/passport';
@@ -10,19 +8,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 // user
 import { UserModule } from 'src/user/user.module';
-import { UserSchema } from 'src/user/schemas/user.schema';
 //
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      {
-        name: 'User',
-        schema: UserSchema,
-      },
-    ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       inject: [ConfigService],

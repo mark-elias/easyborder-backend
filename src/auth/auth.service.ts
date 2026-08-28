@@ -3,14 +3,12 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-// for database stuff
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 // for auth
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
+// prisma
+import { PrismaService } from 'src/prisma/prisma.service';
 // User
-import { User } from 'src/user/schemas/user.schema';
 import { UserService } from 'src/user/user.service';
 // DTOs
 import { CreateUserDto } from 'src/user/DTOs/create-user.dto';
@@ -19,8 +17,7 @@ import { LoginUserDto } from './DTOs/login-user.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(User.name)
-    private userModel: Model<User>,
+    private prisma: PrismaService,
     private jwtService: JwtService,
     private userService: UserService,
   ) {}
@@ -38,8 +35,7 @@ export class AuthService {
       });
 
       // generate token
-      const token = this.jwtService.sign({ id: user._id });
-
+      const token = this.jwtService.sign({ id: user.id });
       // return token
       return { token };
     } catch (error) {
@@ -55,7 +51,15 @@ export class AuthService {
 
     // check if user exists
     // select the password bc its not automatically sent when getting a user
-    const user = await this.userModel.findOne({ email }).select('+password');
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        password: true,
+      },
+    });
+
     // if user does not exist, throw an error
     if (!user) {
       throw new UnauthorizedException('Invalid Credentials');
@@ -69,7 +73,7 @@ export class AuthService {
     }
 
     // generate token
-    const token = this.jwtService.sign({ id: user._id });
+    const token = this.jwtService.sign({ id: user.id });
     return { token };
   }
 }

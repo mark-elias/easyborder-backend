@@ -1,40 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { Crossing } from './crossing.schema';
 
 @Injectable()
 export class CrossingService {
-  constructor(
-    @InjectModel(Crossing.name) private crossingModel: Model<Crossing>,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   // Get crossings by origin country and origin city
   async getCrossingsByCountryAndCity(
     originCountry: string,
     originCity: string,
   ): Promise<Crossing[]> {
-    return this.crossingModel
-      .find({ originCountry, originCity })
-      .sort({ portName: 1 })
-      .exec();
+    return this.prisma.crossing.findMany({
+      where: { originCountry, originCity },
+      orderBy: { portName: 'asc' },
+    });
   }
 
   // ===== used by CBP service ===========
   // Find crossing by port number
   async findByPortNumber(portNumber: string): Promise<Crossing | null> {
-    return this.crossingModel.findOne({ portNumber }).exec();
+    return this.prisma.crossing.findUnique({
+      where: { portNumber },
+    });
   }
 
   // Create new crossing
-  async create(crossingData: any): Promise<Crossing> {
-    const crossing = new this.crossingModel(crossingData);
-    return crossing.save();
+  async create(crossingData: Partial<Crossing>): Promise<Crossing> {
+    return this.prisma.crossing.create({
+      data: crossingData as any,
+    });
   }
 
   // Update existing crossing
-  async update(crossing: Crossing, updates: any): Promise<Crossing> {
-    Object.assign(crossing, updates);
-    return crossing.save();
+  async update(id: string, updates: Partial<Crossing>): Promise<Crossing> {
+    return this.prisma.crossing.update({
+      where: { id },
+      data: updates as any,
+    });
   }
 }

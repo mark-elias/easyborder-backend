@@ -17,6 +17,9 @@ RUN pnpm install
 # copy source code into container
 COPY . .
 
+# 🐘 generate prisma client — @prisma/client is an empty shell until this runs against schema.prisma
+RUN npx prisma generate
+
 # build nest.js app
 RUN pnpm run build
 

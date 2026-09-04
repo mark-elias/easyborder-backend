@@ -35,12 +35,20 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           echo "🚀 pulling latest image"
-          # navigate to easyborder folder where docker-compose.yml lives
-          cd /home/ubuntu/easyborder
-          # --no-deps: only restarts backend container, leaves nginx untouched
-          # --pull always: pulls latest image from Docker Hub automatically
-          docker compose up -d --no-deps --pull always backend
+          cd /home/ubuntu/easyborder  # go to where docker-compose.yml + .env.production live
+          # 🐘 pull the fresh image first, before touching migrations or the running container
+          docker compose pull backend
+
+          # 🐘 spin up a throwaway container from the new image just to run migrations against RDS
+          echo "🗄️ running database migrations"
+          docker compose run --rm backend npx prisma migrate deploy
+
+          # 🐘 now actually swap the live backend container to the new image (pull already happened above)
+          echo "♻️ restarting backend with new image"
+          docker compose up -d --no-deps backend  # --no-deps = don't touch nginx or other services
+
           echo "🧹 cleaning up old images"
-          docker image prune -f
+          docker image prune -f  # clears out old dangling images so EC2 disk doesn't fill up
+
           echo "✅ deployment complete"
-          docker ps | grep easyborder-backend
+          docker ps | grep easyborder-backend  # quick visual check the new container is actually up

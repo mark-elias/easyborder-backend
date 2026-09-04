@@ -1,54 +1,52 @@
 name: Deploy to EC2
-
 on:
   push:
-    branches: [ main ]
-
+    branches: [ main ]  # only run this when i push to main
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
-    
+    runs-on: ubuntu-latest  # fresh github runner every time
+
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
-      
+      uses: actions/checkout@v4  # pull my repo onto the runner
+
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PAT }}
-        
+        password: ${{ secrets.DOCKER_PAT }}  # this is a PAT not my actual pw
+
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
-        context: .
-        push: true
+        context: .  # dockerfile is in root
+        push: true  # push it, don't just build
         tags: |
-          ${{ secrets.DOCKER_USERNAME }}/easyborder-backend:latest
-          ${{ secrets.DOCKER_USERNAME }}/easyborder-backend:${{ github.sha }}
-          
+          ${{ secrets.DOCKER_USERNAME }}/easyborder-backend:latest       # overwrite latest
+          ${{ secrets.DOCKER_USERNAME }}/easyborder-backend:${{ github.sha }}  # also tag w commit sha so i can roll back if needed
+
     - name: Deploy to EC2
-      uses: appleboy/ssh-action@v1.0.3
+      uses: appleboy/ssh-action@v1.0.3  # sshs into ec2 and runs my script
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           echo "🚀 pulling latest image"
-          cd /home/ubuntu/easyborder  # go to where docker-compose.yml + .env.production live
-          # 🐘 pull the fresh image first, before touching migrations or the running container
+          cd /home/ubuntu/easyborder  # where my compose file + .env.production live
+          # pull the new image BEFORE running migrations or restarting anything
           docker compose pull backend
 
-          # 🐘 spin up a throwaway container from the new image just to run migrations against RDS
+          # spin up a throwaway container just to run the migration against RDS
           echo "🗄️ running database migrations"
           docker compose run --rm backend npx prisma migrate deploy
 
-          # 🐘 now actually swap the live backend container to the new image (pull already happened above)
+          # ok now actually swap the live container to the new image
           echo "♻️ restarting backend with new image"
-          docker compose up -d --no-deps backend  # --no-deps = don't touch nginx or other services
+          docker compose up -d --no-deps backend  # no-deps so nginx doesn't restart too
 
           echo "🧹 cleaning up old images"
-          docker image prune -f  # clears out old dangling images so EC2 disk doesn't fill up
+          docker image prune -f  # keep ec2 disk from filling up over time
 
           echo "✅ deployment complete"
-          docker ps | grep easyborder-backend  # quick visual check the new container is actually up
+          docker ps | grep easyborder-backend  # eyeball check that it's actually running

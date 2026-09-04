@@ -21,9 +21,10 @@ jobs:
       with:
         context: .  # dockerfile is in root
         push: true  # push it, don't just build
+        # latest = always current, sha tag = pinned version i can roll back to
         tags: |
-          ${{ secrets.DOCKER_USERNAME }}/easyborder-backend:latest       # overwrite latest
-          ${{ secrets.DOCKER_USERNAME }}/easyborder-backend:${{ github.sha }}  # also tag w commit sha so i can roll back if needed
+          ${{ secrets.DOCKER_USERNAME }}/easyborder-backend:latest
+          ${{ secrets.DOCKER_USERNAME }}/easyborder-backend:${{ github.sha }}
 
     - name: Deploy to EC2
       uses: appleboy/ssh-action@v1.0.3  # sshs into ec2 and runs my script

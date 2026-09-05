@@ -1,15 +1,16 @@
-import { IsEnum, IsMongoId } from 'class-validator';
+import { IsEnum, IsString, IsNotEmpty } from 'class-validator';
 import { TravelerType, LaneType } from '../enums/favorite.enums';
 
 export { TravelerType, LaneType };
 
 export class AddFavoriteDto {
-  @IsMongoId()
-  crossingId: string;
+  @IsString()
+  @IsNotEmpty()
+  crossingId!: string;
 
   @IsEnum(TravelerType)
-  travelerType: TravelerType;
+  travelerType!: TravelerType;
 
   @IsEnum(LaneType)
-  laneType: LaneType;
+  laneType!: LaneType;
 }

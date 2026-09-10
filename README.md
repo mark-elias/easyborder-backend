@@ -49,18 +49,24 @@ flowchart TD
     CF --> Vercel["Vercel<br/>Next.js · Tailwind · shadcn · Zustand"]
     Vercel -->|"API calls from browser"| Nginx
 
-    subgraph EC2["AWS EC2 — Docker Compose"]
-        Nginx["nginx<br/>reverse proxy"]
-        Certbot["certbot<br/>HTTPS certs"]
-        Backend["NestJS<br/>Passport · JWT · cookies"]
+    subgraph Infra["Infra — AWS"]
+        subgraph EC2["EC2 — Docker Compose"]
+            Nginx["nginx<br/>reverse proxy"]
+            Certbot["certbot<br/>HTTPS certs"]
+            Backend["NestJS<br/>Passport · JWT · cookies"]
 
-        Nginx --> Backend
-        Certbot -.->|renews certs for| Nginx
+            Nginx --> Backend
+            Certbot -.->|renews certs for| Nginx
+        end
+
+        RDS["RDS<br/>PostgreSQL"]
+        S3["S3<br/>Post images (planned)"]
+
+        Backend -->|"Prisma · TLS"| RDS
+        Backend --> S3
     end
 
-    Backend -->|"Prisma · TLS"| RDS["AWS RDS<br/>PostgreSQL"]
     Backend --> CBP["CBP API<br/>Wait times"]
-    Backend --> S3["AWS S3<br/>Post images (planned)"]
 
     subgraph CICD["CI/CD"]
         GH["GitHub<br/>push to main"] --> GHA["GitHub Actions"]

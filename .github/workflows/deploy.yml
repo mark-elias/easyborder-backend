@@ -1,53 +1,73 @@
 name: Deploy to EC2
 on:
   push:
-    branches: [ main ]  # only run this when i push to main
+    branches: [ main ]
+
 jobs:
+  # fresh github runner spun up for every deploy
   build-and-deploy:
-    runs-on: ubuntu-latest  # fresh github runner every time
+    runs-on: ubuntu-latest
 
     steps:
+    # pull my repo onto the github runner so other steps can access my files
     - name: Checkout code
-      uses: actions/checkout@v4  # pull my repo onto the runner
+      uses: actions/checkout@v4
 
+    # authenticate with docker hub using username + PAT secret
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PAT }}  # this is a PAT not my actual pw
+        password: ${{ secrets.DOCKER_PAT }}
 
+    # build dockerfile and push two tags to docker hub:
+    # - :latest (always the newest)
+    # - :<git-sha> (pinned version i can roll back to)
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
-        context: .  # dockerfile is in root
-        push: true  # push it, don't just build
-        # latest = always current, sha tag = pinned version i can roll back to
+        context: .
+        push: true
         tags: |
           ${{ secrets.DOCKER_USERNAME }}/easyborder-backend:latest
           ${{ secrets.DOCKER_USERNAME }}/easyborder-backend:${{ github.sha }}
 
+    # copy docker-compose.yml and nginx.conf from repo to EC2
+    # so they stay in sync with git and dont need to be managed manually on the server
+    - name: Copy config files to EC2
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: "docker-compose.yml,nginx.conf"
+        target: "/home/ubuntu/easyborder/"
+
+    # ssh into ec2 and run the deploy script
     - name: Deploy to EC2
-      uses: appleboy/ssh-action@v1.0.3  # sshs into ec2 and runs my script
+      uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          echo "🚀 pulling latest image"
-          cd /home/ubuntu/easyborder  # where my compose file + .env.production live
-          # pull the new image BEFORE running migrations or restarting anything
+          cd /home/ubuntu/easyborder
+
+          # get the new image from docker hub
+          echo "💽 pulling latest image"
           docker compose pull backend
 
-          # spin up a throwaway container just to run the migration against RDS
-          echo "🗄️ running database migrations"
-          docker compose run --rm backend npx prisma migrate deploy
+          # apply any pending prisma migrations to RDS
+          echo "🐘 running database migrations"
+          docker compose run --rm backend pnpm exec prisma migrate deploy
 
-          # ok now actually swap the live container to the new image
-          echo "♻️ restarting backend with new image"
-          docker compose up -d --no-deps backend  # no-deps so nginx doesn't restart too
+          # restart backend only, skip nginx & cerbot
+          echo "🚀 restarting backend with new image"
+          docker compose up -d --no-deps backend
 
-          echo "🧹 cleaning up old images"
-          docker image prune -f  # keep ec2 disk from filling up over time
+          # delete old images to free disk space
+          echo "🧼 cleaning up old images"
+          docker image prune -f
 
           echo "✅ deployment complete"
-          docker ps | grep easyborder-backend  # eyeball check that it's actually running
+          docker ps | grep easyborder-backend

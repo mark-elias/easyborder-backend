@@ -4,10 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreatePostDto } from './DTOs/create-post.dto';
+import { CreatePostDto } from './dto/create-post.dto';
 
 @Injectable()
-export class PostService {
+export class PostsService {
   constructor(private prisma: PrismaService) {}
 
   async create(userId: string, dto: CreatePostDto) {

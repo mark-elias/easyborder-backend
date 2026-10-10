@@ -8,26 +8,26 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
-import { PostService } from './post.service';
+import { PostsService } from './posts.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
-import { CreatePostDto } from './DTOs/create-post.dto';
+import { CreatePostDto } from './dto/create-post.dto';
 import { User } from '@prisma/client';
 import { Throttle } from '@nestjs/throttler';
 
 @Controller('posts')
-export class PostController {
-  constructor(private postService: PostService) {}
+export class PostsController {
+  constructor(private postsService: PostsService) {}
 
   @UseGuards(JwtAuthGuard)
   @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 post per min
   @Post()
   async create(@Request() req: { user: User }, @Body() body: CreatePostDto) {
-    return this.postService.create(req.user.id, body);
+    return this.postsService.create(req.user.id, body);
   }
 
   @Get()
-  async getFeed() {
-    return this.postService.getFeed();
+  async getAll() {
+    return this.postsService.getAll();
   }
 
   @UseGuards(JwtAuthGuard)
@@ -36,6 +36,6 @@ export class PostController {
     @Request() req: { user: User },
     @Param('postId') postId: string,
   ) {
-    return this.postService.delete(req.user.id, postId);
+    return this.postsService.delete(req.user.id, postId);
   }
 }

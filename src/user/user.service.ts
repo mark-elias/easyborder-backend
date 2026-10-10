@@ -11,13 +11,19 @@ export class UserService {
     const existingUser = await this.prisma.user.findUnique({
       where: { email: user.email },
     });
-
-    if (existingUser) {
+    if (existingUser)
       throw new BadRequestException('User with this email already exists');
+
+    // retry up to 5 times if username is taken
+    let username: string = '';
+    for (let i = 0; i < 5; i++) {
+      username = generateUsername();
+      const taken = await this.prisma.user.findUnique({ where: { username } });
+      if (!taken) break;
     }
 
     return this.prisma.user.create({
-      data: user,
+      data: { ...user, username },
     });
   }
 
@@ -66,4 +72,32 @@ export class UserService {
       where: { userId },
     });
   }
+}
+
+// helper function for generating usernames
+function generateUsername(): string {
+  const adjectives = [
+    'Silly',
+    'Happy',
+    'Quick',
+    'Calm',
+    'Bold',
+    'Cool',
+    'Brave',
+    'Snappy',
+  ];
+  const nouns = [
+    'Seal',
+    'Panda',
+    'Hawk',
+    'Wolf',
+    'Fox',
+    'Bear',
+    'Otter',
+    'Lynx',
+  ];
+  const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+  const noun = nouns[Math.floor(Math.random() * nouns.length)];
+  const num = Math.floor(Math.random() * 9000) + 1000; // 4-digit number
+  return `${adj}${noun}${num}`; // e.g. "SillySeal4823"
 }

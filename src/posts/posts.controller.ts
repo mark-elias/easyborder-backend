@@ -26,8 +26,8 @@ export class PostsController {
   }
 
   @Get()
-  async getFeed() {
-    return this.postsService.getFeed();
+  async getAll() {
+    return this.postsService.getAll();
   }
 
   @UseGuards(JwtAuthGuard)

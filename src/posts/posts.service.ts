@@ -22,7 +22,7 @@ export class PostsService {
     });
   }
 
-  async getFeed() {
+  async getAll() {
     return this.prisma.post.findMany({
       orderBy: { createdAt: 'desc' },
       include: {

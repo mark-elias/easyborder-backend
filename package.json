@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "packageManager": "pnpm@10.15.0",
   "engines": {
-    "node": ">=22.0.0",
+    "node": ">=22.23.4",
     "pnpm": ">=10.15.0"
   },
   "description": "",
@@ -26,17 +26,17 @@
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",
-    "@nestjs/common": "^11.0.1",
+    "@nestjs/common": "^11.2.7",
     "@nestjs/config": "^4.0.2",
-    "@nestjs/core": "^11.0.1",
+    "@nestjs/core": "^11.2.7",
     "@nestjs/jwt": "^11.0.1",
     "@nestjs/passport": "^11.0.5",
-    "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/platform-express": "^11.2.7",
     "@nestjs/schedule": "^6.1.1",
     "@nestjs/throttler": "^6.5.0",
     "@prisma/client": "^6.19.3",
     "@types/passport-jwt": "^4.0.1",
-    "axios": "^1.13.5",
+    "axios": "^1.20.0",
     "bcryptjs": "^3.0.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
@@ -70,7 +70,7 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.3",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.20.0"
   },
   "jest": {

@@ -12,7 +12,12 @@ import {
   ReformattedCrossing,
   ReformattedLane,
 } from './cbp.types';
-import { SKIP_PORTS, getOriginCity } from './cbp-mappings';
+import {
+  SKIP_PORTS,
+  getOriginCity,
+  PORT_NAME_OVERRIDES,
+  CROSSING_NAME_OVERRIDES,
+} from './cbp-mappings';
 
 @Injectable()
 export class CbpService {
@@ -71,8 +76,16 @@ export class CbpService {
   // determines origin country & city
   // converts CBP format to my ReformattedCrossing
   private transformPort(port: CBPPort): ReformattedCrossing {
+    // use overridden name if one exists, otherwise use CBP's name
+    const portName = PORT_NAME_OVERRIDES[port.port_number] ?? port.port_name;
+    // use overridden crossing name if one exists, otherwise use CBP's crossing name
+    const crossingName =
+      port.port_number in CROSSING_NAME_OVERRIDES
+        ? CROSSING_NAME_OVERRIDES[port.port_number]
+        : port.crossing_name;
+
     const originCountry = port.border === 'Mexican Border' ? 'MX' : 'CA';
-    const originCity = getOriginCity(port.port_name, originCountry);
+    const originCity = getOriginCity(portName, originCountry);
 
     // maximum lanes
     const maxCommercial = this.parseMaxLanes(
@@ -89,9 +102,9 @@ export class CbpService {
       portNumber: port.port_number,
       originCountry,
       originCity,
-      destinationCity: port.port_name,
-      portName: port.port_name,
-      crossingName: port.crossing_name,
+      destinationCity: portName,
+      portName,
+      crossingName,
       hours: port.hours,
       cbpLastUpdateDate: port.date,
       cbpLastUpdateTime: port.time,

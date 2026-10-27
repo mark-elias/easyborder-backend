@@ -1,6 +1,15 @@
 // Ports to skip (duplicates/unused)
-// export const SKIP_PORTS = ['250608', '250609', '240207', '231002', '230103'];
-export const SKIP_PORTS = ['240207', '231002', '230103'];
+export const SKIP_PORTS = ['250608', '250609', '240207', '231002', '230103'];
+
+// override port names by port number when CBP sends awkward names
+// add entries here as needed: '123456': 'My Port Name'
+export const PORT_NAME_OVERRIDES: Record<string, string> = {};
+
+// override crossing names by port number - use empty string to clear the crossing name
+export const CROSSING_NAME_OVERRIDES: Record<string, string> = {
+  '250601': '', // CBP sends "Passenger" as crossing name which is redundant
+};
+
 // export const SKIP_PORTS: string[] = [];
 
 // US port name → mexican origin city

@@ -7,6 +7,7 @@ WORKDIR /app
 # copy package files first (for caching)
 COPY package*.json ./
 COPY pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml ./
 
 # install pnpm for container
 RUN npm install -g pnpm@12.16.1

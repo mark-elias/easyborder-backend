@@ -1,10 +1,10 @@
-# pnpm project-level settings (pnpm 12+)
-# packages that are allowed to run install scripts (supply chain policy)
-onlyBuiltDependencies:
-  - "@prisma/client"
-  - "@prisma/engines"
-  - prisma
-  - "@swc/core"
-  - esbuild
-  - "@parcel/watcher"
-  - unrs-resolver
+# pnpm 12 build script allowlist (replaces onlyBuiltDependencies from pnpm <11)
+# explicitly approve packages that need to run install/postinstall scripts
+allowBuilds:
+  "@prisma/client": true
+  "@prisma/engines": true
+  prisma: true
+  "@swc/core": true
+  esbuild: true
+  "@parcel/watcher": true
+  unrs-resolver: true

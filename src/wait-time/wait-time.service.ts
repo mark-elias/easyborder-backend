@@ -5,6 +5,11 @@ import { createId } from '@paralleldrive/cuid2';
 import { DRIZZLE_DB } from 'src/db/drizzle.constants';
 import * as schema from 'src/db/schema';
 import { crossings, waitTimes } from 'src/db/schema';
+import {
+  ReformattedCommercialLanes,
+  ReformattedPassengerLanes,
+  ReformattedPedestrianLanes,
+} from 'src/cbp/cbp.types';
 
 @Injectable()
 export class WaitTimeService {
@@ -47,9 +52,9 @@ export class WaitTimeService {
   // INSERT INTO "WaitTime" ...
   async create(waitTimeData: {
     crossingId: string;
-    commercial?: any;
-    passenger?: any;
-    pedestrian?: any;
+    commercial?: ReformattedCommercialLanes;
+    passenger?: ReformattedPassengerLanes;
+    pedestrian?: ReformattedPedestrianLanes;
   }) {
     const now = new Date();
     const [waitTime] = await this.db

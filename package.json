@@ -73,5 +73,16 @@
     "typescript-eslint": "^8.20.0",
     "unplugin-swc": "^1.5.1",
     "vitest": "^3.2.4"
-  }
+  },
+  "pnpm": {
+  "onlyBuiltDependencies": [
+    "@prisma/client",
+    "@prisma/engines",
+    "prisma",
+    "@swc/core",
+    "esbuild",
+    "@parcel/watcher",
+    "unrs-resolver"
+  ]
+}
 }

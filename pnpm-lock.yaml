@@ -209,7 +209,7 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1
       class-validator:
-        specifier: ^0.14.3
+        specifier: ^0.14.4
         version: 0.14.4
       cookie-parser:
         specifier: ^1.4.7
@@ -252,10 +252,10 @@ importers:
         specifier: ^5.0.0
         version: 5.0.6
       '@types/node':
-        specifier: ^22.10.7
+        specifier: ^22.20.5
         version: 22.20.5
       '@types/supertest':
-        specifier: ^6.0.2
+        specifier: ^6.0.3
         version: 6.0.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4

@@ -9,8 +9,8 @@ COPY package*.json ./
 COPY pnpm-lock.yaml ./
 COPY pnpm-workspace.yaml ./
 
-# install pnpm for container
-RUN npm install -g pnpm@12.16.1
+# install pnpm via corepack (built into Node 24, properly runs pnpm setup scripts)
+RUN corepack enable && corepack prepare pnpm@12.16.1 --activate
 
 # install project dependencies
 RUN pnpm install

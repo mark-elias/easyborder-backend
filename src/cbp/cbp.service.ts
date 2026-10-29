@@ -3,8 +3,9 @@ import axios from 'axios';
 // services
 import { CrossingService } from '../crossing/crossing.service';
 import { WaitTimeService } from '../wait-time/wait-time.service';
-// prisma
-import { Crossing } from '@prisma/client';
+// drizzle inferred type for a crossing row
+import { crossings } from 'src/db/schema';
+type Crossing = typeof crossings.$inferSelect;
 // types
 import {
   CBPPort,

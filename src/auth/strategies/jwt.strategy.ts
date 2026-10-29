@@ -1,17 +1,18 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-// for environment variables
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-// prisma
-import { PrismaService } from 'src/prisma/prisma.service';
-// for auth
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
+import { eq } from 'drizzle-orm';
+import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import { DRIZZLE_DB } from 'src/db/drizzle.constants';
+import * as schema from 'src/db/schema';
+import { users } from 'src/db/schema';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private prisma: PrismaService,
+    @Inject(DRIZZLE_DB) private db: PostgresJsDatabase<typeof schema>,
     private configService: ConfigService,
   ) {
     // get the jwt secret from the environment variables
@@ -30,23 +31,20 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
       ignoreExpiration: false,
-      // secret key to verify tooken
       secretOrKey: jwtSecret,
     });
   }
 
-  // validate the token
+  // validate the token and return the user (becomes req.user)
   async validate(payload: { id: string; iat: number; exp: number }) {
-    // get user id from payload (id is the user id from the token)
-    // find the user in the database
-    const user = await this.prisma.user.findUnique({
-      where: { id: payload.id },
+    const user = await this.db.query.users.findFirst({
+      where: eq(users.id, payload.id),
     });
-    // if user is not found, throw an error
+
     if (!user) {
       throw new UnauthorizedException('Invalid token or user not found');
     }
-    // return the user (req.user)
+
     return user;
   }
 }

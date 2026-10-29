@@ -1,23 +1,27 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-// for auth
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-// prisma
-import { PrismaService } from 'src/prisma/prisma.service';
-// User
+// drizzle
+import { eq } from 'drizzle-orm';
+import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import { DRIZZLE_DB } from 'src/db/drizzle.constants';
+import * as schema from 'src/db/schema';
+import { users } from 'src/db/schema';
+// services
 import { UserService } from 'src/user/user.service';
-// DTOs
+// dtos
 import { CreateUserDto } from 'src/user/DTOs/create-user.dto';
 import { LoginUserDto } from './DTOs/login-user.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
+    @Inject(DRIZZLE_DB) private db: PostgresJsDatabase<typeof schema>,
     private jwtService: JwtService,
     private userService: UserService,
   ) {}
@@ -45,19 +49,15 @@ export class AuthService {
       throw error;
     }
   }
+
   async loginUser(loginUserDto: LoginUserDto): Promise<{ token: string }> {
     // get user data from loginUserDto
     const { email, password } = loginUserDto;
 
-    // check if user exists
-    // select the password bc its not automatically sent when getting a user
-    const user = await this.prisma.user.findUnique({
-      where: { email },
-      select: {
-        id: true,
-        email: true,
-        password: true,
-      },
+    // find user by email, selecting only the fields we need
+    const user = await this.db.query.users.findFirst({
+      where: eq(users.email, email),
+      columns: { id: true, email: true, password: true },
     });
 
     // if user does not exist, throw an error

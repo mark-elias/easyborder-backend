@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 // for postgreSQL
 import { PrismaModule } from './prisma/prisma.module';
+import { DrizzleModule } from './db/drizzle.module';
 // rate limiting
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
@@ -24,6 +25,7 @@ import { PostsModule } from './posts/posts.module';
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
     }),
     PrismaModule,
+    DrizzleModule,
     ThrottlerModule.forRoot([
       {
         ttl: 60000, // 1 minute window

@@ -1,5 +1,5 @@
-# start with node 22 with alpine linux (lightweight)
-FROM node:22-alpine
+# start with node 24 with alpine linux (lightweight)
+FROM node:24-alpine
 
 # set working directory inside container
 WORKDIR /app
@@ -9,7 +9,7 @@ COPY package*.json ./
 COPY pnpm-lock.yaml ./
 
 # install pnpm for container
-RUN npm install -g pnpm@10.15
+RUN npm install -g pnpm@12.16.1
 
 # install project dependencies
 RUN pnpm install

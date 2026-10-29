@@ -37,9 +37,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   // validate the token and return the user (becomes req.user)
   async validate(payload: { id: string; iat: number; exp: number }) {
-    const user = await this.db.query.users.findFirst({
-      where: eq(users.id, payload.id),
-    });
+    // SELECT * FROM "User" WHERE id = payload.id
+    const [user] = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.id, payload.id))
+      .limit(1);
 
     if (!user) {
       throw new UnauthorizedException('Invalid token or user not found');

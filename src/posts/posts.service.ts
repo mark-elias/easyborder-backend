@@ -4,7 +4,7 @@ import {
   NotFoundException,
   Inject,
 } from '@nestjs/common';
-import { eq, desc } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { createId } from '@paralleldrive/cuid2';
 import { DRIZZLE_DB } from 'src/db/drizzle.constants';
@@ -21,7 +21,7 @@ export class PostsService {
   async create(userId: string, dto: CreatePostDto) {
     const now = new Date();
 
-    // insert the new post
+    // INSERT INTO "Post" ...
     const [post] = await this.db
       .insert(posts)
       .values({
@@ -33,7 +33,7 @@ export class PostsService {
       })
       .returning();
 
-    // fetch it back with the user's id and username included
+    // SELECT post + user.id, user.username with JOIN
     const [result] = await this.db
       .select({
         id: posts.id,
@@ -54,6 +54,7 @@ export class PostsService {
   }
 
   async getAll() {
+    // SELECT post + user.id, user.username ORDER BY createdAt DESC
     return this.db
       .select({
         id: posts.id,
@@ -72,14 +73,18 @@ export class PostsService {
   }
 
   async delete(userId: string, postId: string): Promise<void> {
-    const post = await this.db.query.posts.findFirst({
-      where: eq(posts.id, postId),
-    });
+    // SELECT to check existence and ownership
+    const [post] = await this.db
+      .select({ id: posts.id, userId: posts.userId })
+      .from(posts)
+      .where(eq(posts.id, postId))
+      .limit(1);
 
     if (!post) throw new NotFoundException('Post not found');
     if (post.userId !== userId)
       throw new ForbiddenException('You can only delete your own posts');
 
+    // DELETE FROM "Post" WHERE id = postId
     await this.db.delete(posts).where(eq(posts.id, postId));
   }
 }

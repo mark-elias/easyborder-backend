@@ -54,11 +54,12 @@ export class AuthService {
     // get user data from loginUserDto
     const { email, password } = loginUserDto;
 
-    // find user by email, selecting only the fields we need
-    const user = await this.db.query.users.findFirst({
-      where: eq(users.email, email),
-      columns: { id: true, email: true, password: true },
-    });
+    // SELECT id, email, password FROM "User" WHERE email = email
+    const [user] = await this.db
+      .select({ id: users.id, email: users.email, password: users.password })
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
 
     // if user does not exist, throw an error
     if (!user) {

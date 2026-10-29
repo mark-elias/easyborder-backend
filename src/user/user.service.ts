@@ -15,9 +15,13 @@ export class UserService {
   ) {}
 
   async create(user: CreateUserDto) {
-    const existingUser = await this.db.query.users.findFirst({
-      where: eq(users.email, user.email),
-    });
+    // SELECT to check if email is already taken
+    const [existingUser] = await this.db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.email, user.email))
+      .limit(1);
+
     if (existingUser)
       throw new BadRequestException('User with this email already exists');
 
@@ -25,13 +29,16 @@ export class UserService {
     let username: string = '';
     for (let i = 0; i < 5; i++) {
       username = generateUsername();
-      const taken = await this.db.query.users.findFirst({
-        where: eq(users.username, username),
-      });
+      const [taken] = await this.db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.username, username))
+        .limit(1);
       if (!taken) break;
     }
 
     const now = new Date();
+    // INSERT INTO "User" ...
     const [newUser] = await this.db
       .insert(users)
       .values({
@@ -52,19 +59,25 @@ export class UserService {
     travelerType: TravelerType,
     laneType: LaneType,
   ) {
-    const existing = await this.db.query.favorites.findFirst({
-      where: and(
-        eq(favorites.userId, userId),
-        eq(favorites.crossingId, crossingId),
-        eq(favorites.travelerType, travelerType),
-        eq(favorites.laneType, laneType),
-      ),
-    });
+    // SELECT to check for duplicate favorite
+    const [existing] = await this.db
+      .select({ id: favorites.id })
+      .from(favorites)
+      .where(
+        and(
+          eq(favorites.userId, userId),
+          eq(favorites.crossingId, crossingId),
+          eq(favorites.travelerType, travelerType),
+          eq(favorites.laneType, laneType),
+        ),
+      )
+      .limit(1);
 
     if (existing) {
       throw new BadRequestException('Favorite already exists');
     }
 
+    // INSERT INTO "Favorite" ...
     const [favorite] = await this.db
       .insert(favorites)
       .values({
@@ -81,14 +94,18 @@ export class UserService {
   }
 
   async removeFavoriteWaitTime(userId: string, favoriteId: string) {
-    const favorite = await this.db.query.favorites.findFirst({
-      where: and(eq(favorites.id, favoriteId), eq(favorites.userId, userId)),
-    });
+    // SELECT to check existence and ownership
+    const [favorite] = await this.db
+      .select({ id: favorites.id })
+      .from(favorites)
+      .where(and(eq(favorites.id, favoriteId), eq(favorites.userId, userId)))
+      .limit(1);
 
     if (!favorite) {
       throw new BadRequestException('Favorite not found');
     }
 
+    // DELETE FROM "Favorite" WHERE id = favoriteId
     const [deleted] = await this.db
       .delete(favorites)
       .where(eq(favorites.id, favoriteId))
@@ -98,9 +115,8 @@ export class UserService {
   }
 
   async getFavorites(userId: string) {
-    return this.db.query.favorites.findMany({
-      where: eq(favorites.userId, userId),
-    });
+    // SELECT * FROM "Favorite" WHERE userId = userId
+    return this.db.select().from(favorites).where(eq(favorites.userId, userId));
   }
 }
 

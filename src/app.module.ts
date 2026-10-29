@@ -5,7 +5,6 @@ import { AppService } from './app.service';
 // for environment variables
 import { ConfigModule } from '@nestjs/config';
 // for postgreSQL
-import { PrismaModule } from './prisma/prisma.module';
 import { DrizzleModule } from './db/drizzle.module';
 // rate limiting
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -24,7 +23,6 @@ import { PostsModule } from './posts/posts.module';
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
     }),
-    PrismaModule,
     DrizzleModule,
     ThrottlerModule.forRoot([
       {

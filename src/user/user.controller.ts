@@ -10,7 +10,8 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
-import { User } from '@prisma/client';
+import { users } from 'src/db/schema';
+type User = typeof users.$inferSelect;
 import { AddFavoriteDto } from './DTOs/add-favorite.dto';
 
 @Controller('user')

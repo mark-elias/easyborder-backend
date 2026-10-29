@@ -57,9 +57,9 @@ jobs:
           echo "💽 pulling latest image"
           docker compose pull backend
 
-          # apply any pending prisma migrations to RDS
+          # apply any pending Drizzle migrations to RDS
           echo "🐘 running database migrations"
-          docker compose run --rm backend pnpm exec prisma migrate deploy
+          docker compose run --rm backend pnpm drizzle-kit migrate
 
           # restart backend only, skip nginx & cerbot
           echo "🚀 restarting backend with new image"

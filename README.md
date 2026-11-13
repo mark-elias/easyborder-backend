@@ -39,7 +39,7 @@ actually happening at the border before you leave the house.
 
 **Auth:** Passport.js, JWTs, cookies
 
-**Infra:** AWS EC2, AWS RDS, AWS S3, Nginx, Certbot, Docker Compose, Docker Hub, GitHub Actions
+**Infra:** AWS EC2, AWS RDS, AWS S3, Nginx, Certbot, Docker Compose, Docker Hub, GitHub Actions, Terraform
 
 ## Architecture
 

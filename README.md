@@ -60,7 +60,7 @@ flowchart TD
         end
 
         RDS["RDS<br/>PostgreSQL"]
-        S3["S3<br/>Post images (planned)"]
+        S3["S3<br/>Post images"]
 
         Backend -->|"Drizzle · TLS"| RDS
         Backend --> S3

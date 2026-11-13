@@ -28,7 +28,7 @@ actually happening at the border before you leave the house.
 - Compare wait times across multiple crossings and lanes
 - Save your favorite crossings for quick access
 - Community feed where travelers post updates and photos about their border wait experiences
-- Authentication with Passport.js, JWTs, and cookies
+- Authentication with Passport.js, JWTs, and bcrypt
 
 ## Tech Stack
 **Frontend:** TypeScript, Next.js, Tailwind, Shadcn, Bun, Tanstack Query, React-Hook-Form, Zod, Zustand

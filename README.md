@@ -33,9 +33,9 @@ actually happening at the border before you leave the house.
 ## Tech Stack
 **Frontend:** TypeScript, Next.js, Tailwind, Shadcn, Bun, Tanstack Query, React-Hook-Form, Zod, Zustand
 
-**Backend:** TypeScript, NestJS, Prisma
+**Backend:** TypeScript, Nest.js
 
-**Database:** PostgreSQL (AWS RDS)
+**Database:** PostgreSQL (AWS RDS), Drizzle
 
 **Auth:** Passport.js, JWTs, cookies
 
